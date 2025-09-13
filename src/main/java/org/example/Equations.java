@@ -1,7 +1,7 @@
 package org.example;
 
 public class Equations {
-float d = 0;
+Variables body [] = new Variables[3];
 
 
 }
