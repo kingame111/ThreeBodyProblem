@@ -1,55 +1,55 @@
 package org.example;
 
 public class body {
-    private double[] r = new double[3]; // מערך של x y z
-    private double[] v = new double[3]; // מערך של vx vy vz
-    private double m; // מסה
+	private double[] r = new double[3]; // מערך של x y z
+	private double[] v = new double[3]; // מערך של vx vy vz
+	private double m; // מסה
 
 
-    // ---getters---
+	// ---getters---
 
-    public double[] getR() { return r; }
+	public double[] getR() { return r; }
 
-    public double[] getV() { return v; }
+	public double[] getV() { return v; }
 
-    public double getM() { return m; }
+	public double getM() { return m; }
 
 
 // ---setters---
 
-    public void setR (double x, double y, double z){
-        this.r[0] = x;
-        this.r[0] = y;
-        this.r[0] = z;
-    }
+	public void setR (double x, double y, double z){
+		this.r[0] = x;
+		this.r[0] = y;
+		this.r[0] = z;
+	}
 
-    public void setV (double vx, double vy, double vz){
-        this.v[0] = vx;
-        this.v[0] = vy;
-        this.v[0] = vz;
-    }
-    public void setM (double m){
-        if ( m > 0){
-            this.m = m;
-        }
-        else {
-            throw new IllegalArgumentException ("יש לתת למסה ערך חיובי");
-        }
-    }
-    body object [] = new body[3];
-    final double G = 6.67430*Math.pow(10, -11);
+	public void setV (double vx, double vy, double vz){
+		this.v[0] = vx;
+		this.v[0] = vy;
+		this.v[0] = vz;
+	}
+	public void setM (double m){
+		if ( m > 0){
+			this.m = m;
+		}
+		else {
+			throw new IllegalArgumentException ("יש לתת למסה ערך חיובי");
+		}
+	}
+	body object [] = new body[3];
+	final double G = 6.67430*Math.pow(10, -11);
 
-    public double distance (body a, body b){ // מרחק בין שתי גופים
-        double total = 0;
-        for (int i = 0; i< 3; i++){// מחשב את המרחק בין X,Y,Z בסדר זה ומחבר את המרחק הקודם עם העכשוי
-            total = total + Math.pow(a.getR()[i]-b.getR()[i],2);
-        }
-        return Math.sqrt(total);
-    }
-    public double gravity (body a, body b){
-        double magnitude = (G*a.getM()*b.getM())/Math.pow(distance(a,b), 2); // נוסחאת גודל כוח כבידה
-        return magnitude;
-    }
+	public double distance (body a, body b){ // מרחק בין שתי גופים
+		double total = 0;
+		for (int i = 0; i< 3; i++){// מחשב את המרחק בין X,Y,Z בסדר זה ומחבר את המרחק הקודם עם העכשוי
+			total = total + Math.pow(a.getR()[i]-b.getR()[i],2);
+		}
+		return Math.sqrt(total);
+	}
+	public double gravity (body a, body b){
+		double magnitude = (G*a.getM()*b.getM())/Math.pow(distance(a,b), 2); // נוסחאת גודל כוח כבידה
+		return magnitude;
+	}
 
 
 
