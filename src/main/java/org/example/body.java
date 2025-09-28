@@ -4,18 +4,25 @@ public class body {
 	private double[] r = new double[3]; // מערך של x y z
 	private double[] v = new double[3]; // מערך של vx vy vz
 	private double m; // מסה
+    final public double G = 6.67430*Math.pow(10, -11);
+    body object [] = new body[3];
 
 
-	// ---getters---
+    // ---getters---
+    //
+    public double[] getR() { return r; }
+    public double getX() { return r[0]; }
+    public double getY() { return r[1]; }
+    public double getZ() { return r[2]; }
 
-	public double[] getR() { return r; }
-
-	public double[] getV() { return v; }
+	public double getVx() { return v[0]; }
+    public double getVy() { return v[1]; }
+    public double getVz() { return v[2]; }
 
 	public double getM() { return m; }
 
 
-// ---setters---
+    // ---setters---
 
 	public void setR (double x, double y, double z){
 		this.r[0] = x;
@@ -36,8 +43,7 @@ public class body {
 			throw new IllegalArgumentException ("יש לתת למסה ערך חיובי");
 		}
 	}
-	body object [] = new body[3];
-	final double G = 6.67430*Math.pow(10, -11);
+
 
 	public double distance (body a, body b){ // מרחק בין שתי גופים
 		double total = 0;
@@ -46,8 +52,10 @@ public class body {
 		}
 		return Math.sqrt(total);
 	}
+
+
 	public double gravity (body a, body b){
-		double magnitude = (G*a.getM()*b.getM())/Math.pow(distance(a,b), 2); // נוסחאת גודל כוח כבידה
+		double magnitude = (G*a.getM()*b.getM())/Math.pow(a.getX() - b.getX(), 2); // נוסחאת גודל כוח כבידה
 		return magnitude;
 	}
 
