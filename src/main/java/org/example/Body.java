@@ -50,8 +50,8 @@ public class Body {
 		}
 	}
 
-
-	public static double distance (Body a, Body b){ // מרחק בין שתי גופים
+    // פעולה לחישוב מרחק בין שתי גופים
+	public static double distance (Body a, Body b){
 		double total = 0;
 		for (int i = 0; i< 3; i++){// מחשב את המרחק בין X,Y,Z בסדר זה ומחבר את המרחק הקודם עם העכשוי
 			total = total + Math.pow(a.getR()[i]-b.getR()[i],2);
@@ -59,8 +59,8 @@ public class Body {
 		return Math.sqrt(total);
 	}
 
-
-	public double[] gravity ( Body b){ // מחשב את הכוח שגוף מפעיל על האובייקט
+    // פעולה המחשבת את הכוח שגוף מפעיל על האובייקט (ב 2 גופים)
+	public double[] gravity ( Body b){
 		double d = distance(this,b);
 		double magnitude = (G*this.getM()*b.getM())/(d*d); // נוסחאת גודל כוח כבידה
 		double[] Fg = new double[3];
@@ -69,19 +69,19 @@ public class Body {
 		Fg[2] = magnitude * (b.getZ() - this.getZ()) / d;
 		return Fg;
 	}
-
-	public double[] totalGravitationalForce(Body[] bodies){// מחשב את סך הכוחות הפועל על האובייקט בn גופים
+    // פעולה המחשבת את סך הכוחות הפועלים על האובייקט בn גופים
+	public double[] totalGravitationalForce(Body target, Body[] bodies){
 		double[] Fg = new double[3];
 
-		for (int i = 0; i<bodies.length; i++) {
+		for (int i = 0; i < bodies.length; i++) {
 
-			if (this == bodies[i]) {continue;}
+			if (target == bodies[i]) {continue;}
 
 			double sqrtD, d, dX, dY, dZ, m;
-			dX = bodies[i].getX() - this.getX();
-			dY = bodies[i].getY() - this.getY();
-			dZ = bodies[i].getZ() - this.getZ();
-			m = this.getM() * bodies[i].getM();
+			dX = bodies[i].getX() - target.getX();
+			dY = bodies[i].getY() - target.getY();
+			dZ = bodies[i].getZ() - target.getZ();
+			m = target.getM() * bodies[i].getM();
 			d = (dX * dX) + (dY * dY) + (dZ * dZ);
             sqrtD = Math.sqrt(d);
 
