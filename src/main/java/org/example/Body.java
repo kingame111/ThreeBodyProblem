@@ -1,35 +1,35 @@
 package org.example;
 
 public class Body {
-	private double[] r = new double[3]; // מערך של x y z
+	private double[] place = new double[3]; // מערך של x y z
 	private double[] v = new double[3]; // מערך של vx vy vz
 	private double m; // מסה
+	private double radius; // רדיוס
 	static final public double G = 6.67430 * Math.pow(10, -11);
 
-	public Body(double[] r, double[] v, double m) {
-		this.r = r;
+	public Body(double[] r, double[] v, double m, double radius) {
+		this.place = r;
 		this.v = v;
 		this.m = m;
-
-
+		this.radius = radius;
 	}
 
 	// ---getters---
 	public double[] getR() {
-		return java.util.Arrays.copyOf(r, r.length);
+		return java.util.Arrays.copyOf(place, place.length);
 		// יוצר מערך מועתק מr באורך r.length
 	}
 
 	public double getX() {
-		return r[0];
+		return place[0];
 	}
 
 	public double getY() {
-		return r[1];
+		return place[1];
 	}
 
 	public double getZ() {
-		return r[2];
+		return place[2];
 	}
 
 	public double[] getV() {
@@ -53,13 +53,16 @@ public class Body {
 		return m;
 	}
 
+	public double getRadius() {
+		return radius;
+	}
 
 	// ---setters---
 
 	public void setR(double x, double y, double z) {
-		this.r[0] = x;
-		this.r[1] = y;
-		this.r[2] = z;
+		this.place[0] = x;
+		this.place[1] = y;
+		this.place[2] = z;
 	}
 
 	public void setV(double vx, double vy, double vz) {
@@ -75,6 +78,17 @@ public class Body {
 			throw new IllegalArgumentException("יש לתת למסה ערך חיובי");
 		}
 	}
+
+	public void setRadius(double radius) {
+		if (radius > 0) {
+			this.radius = radius;
+		} else {
+			throw new IllegalArgumentException("יש לתת לרדיוס ערך חיובי");
+		}
+	}
+
+
+	// ---methods---
 
 	// פעולה לחישוב מרחק בין שתי גופים
 	public static double distance(Body a, Body b) {

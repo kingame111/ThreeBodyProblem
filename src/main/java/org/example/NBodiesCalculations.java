@@ -2,6 +2,8 @@ package org.example;
 
 import org.hipparchus.ode.OrdinaryDifferentialEquation;
 
+import java.util.Arrays;
+
 public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 	private final int bodiesNum; // מספר הגופים בסימולציה
 	private final double[] m; // המסות של הגופים בסימולציה
@@ -47,15 +49,13 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 	// פעולה המחשבת תאוצה של גוף
 	public void accelerationCalc(double[] state) {
 
-		for (int i = 0; i < a.length; i++) { // מאפס את כל הערכים של a
-			a[i] = 0.0;
-		}
+		Arrays.fill(a, 0.0); // פעולה הממלאת את כל ערכי המערך בערך נתון
 
 		for (int i = 0; i < bodiesNum; i++) {
 			int i6 = 6 * i;
-			double xi = state[i6];
-			double yi = state[i6 + 1];
-			double zi = state[i6 + 2];
+			double xi = state[i6]; // ערך מיקום הx של גוף i
+			double yi = state[i6 + 1]; // ערך מיקום הy של גוף i
+			double zi = state[i6 + 2]; // ערך מיקום הz של גוף i
 
 			for (int j = 0; j < bodiesNum; j++) {
 
@@ -96,25 +96,22 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 	@Override
 	public double[] computeDerivatives(double t, double[] state) {
 		double[] stateDerivative = new double[6 * bodiesNum];
+		accelerationCalc(state); // מעדכן את מערך a לתאוצות העדכניות
 
-		// :stateDerivative לולאה ליישום ערכי המהירות בתוך
+		// :stateDerivative לולאה להשמת ערכי המהירות בתוך
 		for (int i = 0; i < bodiesNum; i++) {
-			int k = i * 6;
-			stateDerivative[k] = state[k + 3];
-			stateDerivative[k + 1] = state[k + 4];
-			stateDerivative[k + 2] = state[k + 5];
+			int i6 = i * 6;
+			int i3 = i * 3;
+
+			stateDerivative[i6] = state[i6 + 3]; //מעביר את ערכי המיהירות בx שבstate לstateDerivative
+			stateDerivative[i6 + 1] = state[i6 + 4]; // מעביר את ערכי המיהירות בy שבstate לstateDerivative
+			stateDerivative[i6 + 2] = state[i6 + 5]; // מעביר את ערכי המיהירות בz שבstate לstateDerivative
+			stateDerivative[i6 + 3] = a[i3];  // מיישם את ערך xi בstateDerivative
+			stateDerivative[i6 + 4] = a[i3 + 1]; // מיישם את ערך yi בstateDerivative
+			stateDerivative[i6 + 5] = a[i3 + 2]; // מיישם את ערך zi בstateDerivative
 
 		}
-
-		// :stateDerivative לולאה להמרת המהירות לתאוצה והשמת התוצאה בתוך
-		for (int i = 0; i < bodiesNum; i++) {
-			int k = i * 6;
-			stateDerivative[k + 3] = state[k * 3];
-			stateDerivative[k + 4] = state[k * 4];
-			stateDerivative[k + 5] = state[k * 5];
-
-		}
-		return stateDerivative;
+		return stateDerivative.clone();
 	}
 
 
