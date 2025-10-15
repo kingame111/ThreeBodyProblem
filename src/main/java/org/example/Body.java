@@ -1,17 +1,19 @@
 package org.example;
 
 public class Body {
-	private double[] place = new double[3]; // מערך של x y z
-	private double[] v = new double[3]; // מערך של vx vy vz
-	private double m; // מסה
-	private double radius; // רדיוס
+	private double[] place = new double[3]; // מערך של x y z המכיל את מיקום האובייקט
+	private double[] v = new double[3]; // מערך של vx vy vz המכיל את מהירויות האובייקט
+	private double m; // מסת האובייקט
+	private double radius; // הרדיוס של האובייקט
+	private String name; // השם של האובייקט
 	static final public double G = 6.67430 * Math.pow(10, -11);
 
-	public Body(double[] r, double[] v, double m, double radius) {
-		this.place = r;
+	public Body(double[] place, double[] v, double m, double radius, String name) {
+		this.place = place;
 		this.v = v;
 		this.m = m;
 		this.radius = radius;
+		this.name = name;
 	}
 
 	// ---getters---
@@ -57,7 +59,10 @@ public class Body {
 		return radius;
 	}
 
-	// ---setters---
+	public String getName() {
+		return name;
+	}
+// ---setters---
 
 	public void setR(double x, double y, double z) {
 		this.place[0] = x;
@@ -88,7 +93,7 @@ public class Body {
 	}
 
 
-	// ---methods---
+// ---methods---
 
 	// פעולה לחישוב מרחק בין שתי גופים
 	public static double distance(Body a, Body b) {
