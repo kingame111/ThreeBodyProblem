@@ -83,7 +83,8 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 
 	@Override
 	public int getDimension() {
-		return (6 * bodiesNum); /* קובע שהמימד של המערכת יהיה תלת מימדי
+		return (6 * bodiesNum); /*
+		 קובע שהמימד של המערכת יהיה תלת מימדי
 		בגלל שלכל גוף בתלת מימד יש שישה ערכים התחלתיים (XYZ,vXvYvZ)
 
 		הערך שהפעולה מחזירה (6 * n) מבוטא כמערך שנרא כך:
@@ -95,23 +96,22 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 
 	@Override
 	public double[] computeDerivatives(double t, double[] state) {
-		double[] stateDerivative = new double[6 * bodiesNum];
 		accelerationCalc(state); // מעדכן את מערך a לתאוצות העדכניות
 
-		// :stateDerivative לולאה להשמת ערכי המהירות בתוך
+		// :stateDer לולאה להשמת ערכי המהירות בתוך
 		for (int i = 0; i < bodiesNum; i++) {
 			int i6 = i * 6;
 			int i3 = i * 3;
 
-			stateDerivative[i6] = state[i6 + 3]; //מעביר את ערכי המיהירות בx שבstate לstateDerivative
-			stateDerivative[i6 + 1] = state[i6 + 4]; // מעביר את ערכי המיהירות בy שבstate לstateDerivative
-			stateDerivative[i6 + 2] = state[i6 + 5]; // מעביר את ערכי המיהירות בz שבstate לstateDerivative
-			stateDerivative[i6 + 3] = a[i3];  // מיישם את ערך xi בstateDerivative
-			stateDerivative[i6 + 4] = a[i3 + 1]; // מיישם את ערך yi בstateDerivative
-			stateDerivative[i6 + 5] = a[i3 + 2]; // מיישם את ערך zi בstateDerivative
+			stateDer[i6] = state[i6 + 3]; //מעביר את ערכי המיהירות בx שבstate לstateDerivative
+			stateDer[i6 + 1] = state[i6 + 4]; // מעביר את ערכי המיהירות בy שבstate לstateDerivative
+			stateDer[i6 + 2] = state[i6 + 5]; // מעביר את ערכי המיהירות בz שבstate לstateDerivative
+			stateDer[i6 + 3] = a[i3];  // מיישם את ערך xi בstateDerivative
+			stateDer[i6 + 4] = a[i3 + 1]; // מיישם את ערך yi בstateDerivative
+			stateDer[i6 + 5] = a[i3 + 2]; // מיישם את ערך zi בstateDerivative
 
 		}
-		return stateDerivative.clone();
+		return stateDer.clone();
 	}
 
 

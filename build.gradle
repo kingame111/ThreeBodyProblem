@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
 group = 'org.example'
@@ -11,43 +12,51 @@ repositories {
 }
 
 java {
-    // קובע קומפילציה והרצה על Java 21
+    // קומפילציה והרצה על Java 21 (אם אין מקומי, Gradle יוריד toolchain פעם אחת)
     toolchain { languageVersion = JavaLanguageVersion.of(21) }
 }
 
+javafx {
+    version = "21.0.3"
+    modules = [ 'javafx.controls', 'javafx.graphics' ] // הוסף מודולים לפי הצורך
+}
+
 dependencies {
-    // Jackson (JSON)
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:2.17.1")
-    implementation("com.fasterxml.jackson.core:jackson-core:2.17.1")
+    // Jackson
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.17.1"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:2.17.1"
+    implementation "com.fasterxml.jackson.core:jackson-core:2.17.1"
 
-    // OpenCSV (CSV)
-    implementation("com.opencsv:opencsv:5.9")
+    // OpenCSV
+    implementation "com.opencsv:opencsv:5.9"
 
-    // SQLite JDBC (DB מקומי)
-    implementation("org.xerial:sqlite-jdbc:3.46.0.0")
+    // SQLite JDBC
+    implementation "org.xerial:sqlite-jdbc:3.46.0.0"
 
-    // Hipparchus (מתמטיקה / ODE) — גרסה 3.1
-    implementation("org.hipparchus:hipparchus-core:3.1")
-    implementation("org.hipparchus:hipparchus-ode:3.1")
+    // Hipparchus
+    implementation "org.hipparchus:hipparchus-core:3.1"
+    implementation "org.hipparchus:hipparchus-ode:3.1"
 
-    // JavaFX (classifier לפי מערכת ההפעלה)
-    def os = org.gradle.internal.os.OperatingSystem.current()
-    def jfxPlatform = os.isWindows() ? "win" : (os.isLinux() ? "linux" : "mac")
-    implementation("org.openjfx:javafx-controls:21.0.3:$jfxPlatform")
-    implementation("org.openjfx:javafx-graphics:21.0.3:$jfxPlatform")
-    implementation("org.openjfx:javafx-base:21.0.3:$jfxPlatform")
-
-    // JUnit (בדיקות)
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    // JUnit
+    testImplementation platform("org.junit:junit-bom:5.10.0")
+    testImplementation "org.junit.jupiter:junit-jupiter"
 }
 
 application {
-    // עדכן לשם המחלקה הראשית שלך (כולל ה-package)
+    // מחלקת main (כולל ה-package)
     mainClass = 'org.example.Main'
-    // עוזר להרצת JavaFX בפרויקט לא-מודולרי
-    applicationDefaultJvmArgs = ['--add-modules=javafx.controls,javafx.graphics']
+    // UTF-8 להרצה (לא מוסיפים כאן --add-modules)
+    applicationDefaultJvmArgs += ['-Dfile.encoding=UTF-8']
+}
+
+// UTF-8 בקומפילציה
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+// חיבור קלט קונסול להרצת gradlew run (כדי ש-Scanner יעבוד)
+tasks.withType(JavaExec).configureEach {
+    standardInput = System.in
 }
 
 test {

@@ -1,18 +1,20 @@
 package org.example;
 
+import java.util.Arrays;
+
 public class Body {
 	private double[] place = new double[3]; // מערך של x y z המכיל את מיקום האובייקט
 	private double[] v = new double[3]; // מערך של vx vy vz המכיל את מהירויות האובייקט
 	private double m; // מסת האובייקט
-	private double radius; // הרדיוס של האובייקט
+
 	private String name; // השם של האובייקט
 	static final public double G = 6.67430 * Math.pow(10, -11);
 
-	public Body(double[] place, double[] v, double m, double radius, String name) {
+	public Body(double[] place, double[] v, double m, String name) {
 		this.place = place;
 		this.v = v;
 		this.m = m;
-		this.radius = radius;
+
 		this.name = name;
 	}
 
@@ -55,10 +57,6 @@ public class Body {
 		return m;
 	}
 
-	public double getRadius() {
-		return radius;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -81,14 +79,6 @@ public class Body {
 			this.m = m;
 		} else {
 			throw new IllegalArgumentException("יש לתת למסה ערך חיובי");
-		}
-	}
-
-	public void setRadius(double radius) {
-		if (radius > 0) {
-			this.radius = radius;
-		} else {
-			throw new IllegalArgumentException("יש לתת לרדיוס ערך חיובי");
 		}
 	}
 
@@ -143,4 +133,47 @@ public class Body {
 		return Fg;
 	}
 
+	/*
+	 פעולה ההופכת את נתוני הגוף לString על פי String שהי מקבלת
+	 לדוגמה הקלט "m" ידפיס את ערך מסת בגוף כString
+	 */
+	public String toString(String var) {
+		var = var.toLowerCase();
+
+		switch (var) {
+			case "place" -> { //
+				return Arrays.toString(place); // אם var שווה place (String) אז מחזיר את המערך place כString
+			}
+			case "v" -> {
+				return Arrays.toString(v); // אם var שווה v (String) אז מחזיר את המערך v כString
+			}
+			case "m" -> {
+				return Double.toString(m); // אם var שווה m (String) אז מחזיר את המשתנה m כString
+			}
+			default -> {
+				return " משתנה לא ידוע" + var;
+			}
+
+		}
+	}
+
+	/*
+	פעולה המדפיסה את כל הנתונים על האובייקט
+	 */
+	public void printId() {
+		System.out.println("name: " + name);
+		System.out.println("position: " + toString("place"));
+		System.out.println("velocity: " + toString("v"));
+		System.out.println("mass: " + toString("m"));
+	}
+
+	/*
+	פעולה המחזירה את כל הנתונים על האובייקט
+	 */
+	public String returnId() {
+		return "name: " + name + "\n" +
+				"position: " + toString("place") + "\n" +
+				"velocity: " + toString("v") + "\n" +
+				"mass: " + toString("m");
+	}
 }
