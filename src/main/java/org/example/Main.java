@@ -1,13 +1,13 @@
 package org.example;
 
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Scanner;
-
 import org.hipparchus.ode.ODEState;
 import org.hipparchus.ode.ODEStateAndDerivative;
 import org.hipparchus.ode.OrdinaryDifferentialEquation;
 import org.hipparchus.ode.nonstiff.DormandPrince853Integrator;
+
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Scanner;
 
 public class Main {
 

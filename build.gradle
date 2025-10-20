@@ -18,7 +18,7 @@ java {
 
 javafx {
     version = "21.0.3"
-    modules = [ 'javafx.controls', 'javafx.graphics' ] // הוסף מודולים לפי הצורך
+    modules = ['javafx.controls', 'javafx.graphics'] // הוסף מודולים לפי הצורך
 }
 
 dependencies {

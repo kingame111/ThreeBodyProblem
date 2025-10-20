@@ -3,12 +3,11 @@ package org.example;
 import java.util.Arrays;
 
 public class Body {
+	static final public double G = 6.67430 * Math.pow(10, -11);
 	private double[] place = new double[3]; // מערך של x y z המכיל את מיקום האובייקט
 	private double[] v = new double[3]; // מערך של vx vy vz המכיל את מהירויות האובייקט
 	private double m; // מסת האובייקט
-
 	private String name; // השם של האובייקט
-	static final public double G = 6.67430 * Math.pow(10, -11);
 
 	public Body(double[] place, double[] v, double m, String name) {
 		this.place = place;
@@ -16,6 +15,15 @@ public class Body {
 		this.m = m;
 
 		this.name = name;
+	}
+
+	// פעולה לחישוב מרחק בין שתי גופים
+	public static double distance(Body a, Body b) {
+		double total = 0;
+		for (int i = 0; i < 3; i++) { // מחשב את המרחק בין X,Y,Z בסדר זה ומחבר את המרחק הקודם עם העכשוי
+			total = total + Math.pow(a.getR()[i] - b.getR()[i], 2);
+		}
+		return Math.sqrt(total);
 	}
 
 	// ---getters---
@@ -56,23 +64,7 @@ public class Body {
 	public double getM() {
 		return m;
 	}
-
-	public String getName() {
-		return name;
-	}
 // ---setters---
-
-	public void setR(double x, double y, double z) {
-		this.place[0] = x;
-		this.place[1] = y;
-		this.place[2] = z;
-	}
-
-	public void setV(double vx, double vy, double vz) {
-		this.v[0] = vx;
-		this.v[1] = vy;
-		this.v[2] = vz;
-	}
 
 	public void setM(double m) {
 		if (m > 0) {
@@ -82,16 +74,23 @@ public class Body {
 		}
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setR(double x, double y, double z) {
+		this.place[0] = x;
+		this.place[1] = y;
+		this.place[2] = z;
+	}
+
 
 // ---methods---
 
-	// פעולה לחישוב מרחק בין שתי גופים
-	public static double distance(Body a, Body b) {
-		double total = 0;
-		for (int i = 0; i < 3; i++) { // מחשב את המרחק בין X,Y,Z בסדר זה ומחבר את המרחק הקודם עם העכשוי
-			total = total + Math.pow(a.getR()[i] - b.getR()[i], 2);
-		}
-		return Math.sqrt(total);
+	public void setV(double vx, double vy, double vz) {
+		this.v[0] = vx;
+		this.v[1] = vy;
+		this.v[2] = vz;
 	}
 
 	// פעולה המחשבת את הכוח שגוף מפעיל על האובייקט (ב 2 גופים)
