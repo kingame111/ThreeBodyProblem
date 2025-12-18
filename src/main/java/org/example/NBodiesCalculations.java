@@ -6,18 +6,17 @@ import java.util.Arrays;
 
 public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 	private final int bodiesNum; // מספר הגופים בסימולציה
-	private final double[] m; // המסות של הגופים בסימולציה
+	private final Body[] bodies;
 	private final double[] a; // התאוצות של הגופים השונים בצירים השונים
 	private final double[] stateDer; // הנגזרת של state
 
 
 	// בנאי
-	public NBodiesCalculations(double[] masses) {
-		this.bodiesNum = masses.length;
-		this.m = masses.clone();
-		this.a = new double[3 * masses.length];
-		this.stateDer = new double[6 * masses.length];
-
+	public NBodiesCalculations(Body[] bodies) {
+		this.bodiesNum = bodies.length;
+		this.bodies = bodies.clone();          // הגנה מפני שינוי מערך מבחוץ
+		this.a = new double[3 * bodiesNum];
+		this.stateDer = new double[6 * bodiesNum];
 	}
 
 
@@ -49,7 +48,16 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 	// פעולה המחשבת תאוצה של גוף
 	public void accelerationCalc(double[] state) {
 
+		if (state.length != getDimension()) { // בודק שהאורך של state תקני
+			throw new IllegalArgumentException(
+					"State length mismatch: expected " + getDimension() +
+							", got " + state.length
+			);
+		}
+
 		Arrays.fill(a, 0.0); // פעולה הממלאת את כל ערכי המערך בערך נתון
+
+		double softening2 = 1e-12; // (10^-12) softening
 
 		for (int i = 0; i < bodiesNum; i++) {
 			int i6 = 6 * i;
@@ -66,11 +74,11 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 				double dy = state[j6 + 1] - yi;
 				double dz = state[j6 + 2] - zi;
 
-				double r2 = dx * dx + dy * dy + dz * dz; // מרחק בריבוע בין שני גופים
+				double r2 = dx*dx + dy*dy + dz*dz + softening2; //  מרחק בריבוע בין שני גופים + softening
 				double invR = 1.0 / Math.sqrt(r2); // נוצר בשביל המשתנה הבא
 				double invR3 = invR * invR * invR; //    נוצר בשביל סדר ויעילות| פירוט לגבי הסיבה ללמה המשתנה בשלישית בעוד מספר שורות
 
-				double acc = Body.G * m[j] * invR3; // נוסחה לחישוב תאוצה
+				double acc = Body.G * bodies[j].getM() * invR3; // נוסחה לחישוב תאוצה
 
 				a[3 * i] += acc * dx; // dx אמור להיות חלקי r כדי שיהיה רק עם כיוון ללא גודל אך זה נעשה בinvR3
 				a[3 * i + 1] += acc * dy; // dy אמור להיות חלקי r כדי שיהיה רק עם כיוון ללא גודל אך זה נעשה בinvR3
@@ -96,6 +104,14 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 
 	@Override
 	public double[] computeDerivatives(double t, double[] state) {
+
+		if (state.length != getDimension()) { // בודק שהאורך של state תקני
+			throw new IllegalArgumentException(
+					"State length mismatch: expected " + getDimension() +
+							", got " + state.length
+			);
+		}
+
 		accelerationCalc(state); // מעדכן את מערך a לתאוצות העדכניות
 
 		// :stateDer לולאה להשמת ערכי המהירות בתוך
@@ -106,12 +122,12 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 			stateDer[i6] = state[i6 + 3]; //מעביר את ערכי המיהירות בx שבstate לstateDerivative
 			stateDer[i6 + 1] = state[i6 + 4]; // מעביר את ערכי המיהירות בy שבstate לstateDerivative
 			stateDer[i6 + 2] = state[i6 + 5]; // מעביר את ערכי המיהירות בz שבstate לstateDerivative
-			stateDer[i6 + 3] = a[i3];  // מיישם את ערך xi בstateDerivative
-			stateDer[i6 + 4] = a[i3 + 1]; // מיישם את ערך yi בstateDerivative
-			stateDer[i6 + 5] = a[i3 + 2]; // מיישם את ערך zi בstateDerivative
+			stateDer[i6 + 3] = a[i3];  // מיישם את ערך ax בstateDerivative
+			stateDer[i6 + 4] = a[i3 + 1]; // מיישם את ערך ay בstateDerivative
+			stateDer[i6 + 5] = a[i3 + 2]; // מיישם את ערך az בstateDerivative
 
 		}
-		return stateDer.clone();
+		return stateDer;
 	}
 
 
