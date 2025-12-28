@@ -13,7 +13,6 @@ public class Body {
 		this.place = place;
 		this.v = v;
 		this.m = m;
-
 		this.name = name;
 	}
 
@@ -64,6 +63,10 @@ public class Body {
 	public double getM() {
 		return m;
 	}
+
+	public String getName() {
+		return name;
+	}
 // ---setters---
 
 	public void setM(double m) {
@@ -74,9 +77,6 @@ public class Body {
 		}
 	}
 
-	public String getName() {
-		return name;
-	}
 
 	public void setR(double x, double y, double z) {
 		this.place[0] = x;
@@ -84,14 +84,14 @@ public class Body {
 		this.place[2] = z;
 	}
 
-
-// ---methods---
-
 	public void setV(double vx, double vy, double vz) {
 		this.v[0] = vx;
 		this.v[1] = vy;
 		this.v[2] = vz;
 	}
+
+
+// ---methods---
 
 	// פעולה המחשבת את הכוח שגוף מפעיל על האובייקט (ב 2 גופים)
 	public double[] gravity(Body b) {
