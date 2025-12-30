@@ -1,12 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
-            prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.MainController">
-    <center>
-        <AnchorPane fx:id="view3DHost" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
-    </center>
-</BorderPane>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.*?>
+<StackPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="org.example.MainController">
+    <children>
+        <BorderPane>
+            <center>
+                <AnchorPane fx:id="view3DHost" BorderPane.alignment="CENTER"/>
+            </center>
+        </BorderPane>
+        <HBox pickOnBounds="false" StackPane.alignment="TOP_LEFT">
+            <StackPane.margin>
+                <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
+            </StackPane.margin>
+            <children>
+                <VBox fx:id="drawer" prefWidth="340.0" spacing="10.0" styleClass="drawer">
+                    <padding>
+                        <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
+                    </padding>
+                </VBox>
+                <Button fx:id="drawerHandle" mnemonicParsing="false" onAction="#toggleDrawer" prefWidth="44.0"
+                        styleClass="drawer-handle" text="☰" textAlignment="JUSTIFY"/>
+            </children>
+        </HBox>
+    </children>
+</StackPane>
