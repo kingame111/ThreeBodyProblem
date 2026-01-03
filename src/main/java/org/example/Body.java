@@ -9,11 +9,11 @@ public class Body {
 	private double m; // מסת האובייקט
 	private String name; // השם של האובייקט
 
-	public Body(double[] place, double[] v, double m, String name) {
-		this.place = place;
-		this.v = v;
-		this.m = m;
+	public Body(String name, double m, double[] place, double[] v) {
 		this.name = name;
+		this.m = m;
+		this.place = place.clone();
+		this.v = v.clone();
 	}
 
 	// פעולה לחישוב מרחק בין שתי גופים

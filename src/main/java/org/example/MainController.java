@@ -2,9 +2,11 @@ package org.example;
 
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.*;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -13,6 +15,18 @@ import javafx.scene.shape.Sphere;
 import javafx.util.Duration;
 
 public class MainController {
+
+	@FXML
+	private TableView<BodyRow> bodiesTable;
+	@FXML
+	private TableColumn<BodyRow, String> colName;
+	@FXML
+	private TableColumn<BodyRow, Number> colM, colX, colY, colZ, colVx, colVy, colVz;
+
+	@FXML
+	private TextField nameField, massField, xField, yField, zField, vxField, vyField, vzField;
+
+	private final ObservableList<BodyRow> rows = FXCollections.observableArrayList();
 
 
 	@FXML
@@ -26,6 +40,9 @@ public class MainController {
 
 	private boolean open = true;
 
+	private double xOpen;
+	private double xClosed;
+
 	@FXML
 	private void toggleDrawer() {
 		setOpen(!open, true); // אם לא פתוח תפתח ותנפיש
@@ -34,11 +51,14 @@ public class MainController {
 	private void setOpen(boolean shouldOpen, boolean animate) {
 		open = shouldOpen;
 
-		double w = drawer.getPrefWidth(); // נותן את הרוחב המועדף שסמתי לdrawer
+		double w = drawer.getWidth(); // נותן את הרוחב המועדף ששמתי לdrawer
 		double targetX = open ? 0 : -w;   //אם open הוא true אז לא זזים אם הוא false אז זזים w (מינוס בגלל שזזים לכיוון הנגדי)
+
+		drawerHandle.setLayoutX(shouldOpen ? xOpen : xClosed);
+		drawerHandle.setText(shouldOpen ? "✕" : "☰");
+
 		if (!animate) {
 			drawer.setTranslateX(targetX);
-			drawerHandle.setText(shouldOpen ? "✕" : "☰"); // אם shouldOpen נכון אז x אחרת ☰
 			return;
 		}
 
@@ -47,7 +67,7 @@ public class MainController {
 		tt.setInterpolator(Interpolator.EASE_BOTH); // עושה שהאנימציה תתחיל לאט תהיה מהיר באמצע ותסיים לאט
 		tt.play();
 
-		drawerHandle.setText(shouldOpen ? "✕" : "☰");
+
 	}
 
 	public static Sphere[] twoBodyDemoImplementer() {
@@ -62,6 +82,7 @@ public class MainController {
 		twoSphereDemo[0].setTranslateZ(100);
 		return twoSphereDemo;
 	}
+
 
 	@FXML
 	public void initialize() {
@@ -82,6 +103,33 @@ public class MainController {
 		world.getChildren().add(spheres); // מוסיף את spheres לworld
 		*/
 
+		bodiesTable.setItems(rows);
+
+		colName.setCellValueFactory(c -> c.getValue().nameProperty());
+		colM.setCellValueFactory(c -> c.getValue().mProperty());
+		colX.setCellValueFactory(c -> c.getValue().xProperty());
+		colY.setCellValueFactory(c -> c.getValue().yProperty());
+		colZ.setCellValueFactory(c -> c.getValue().zProperty());
+		colVx.setCellValueFactory(c -> c.getValue().vxProperty());
+		colVy.setCellValueFactory(c -> c.getValue().vyProperty());
+		colVz.setCellValueFactory(c -> c.getValue().vzProperty());
+
+		// קליק על שורה -> מילוי הטופס
+		bodiesTable.getSelectionModel().selectedItemProperty().addListener((obs, oldRow, r) -> {
+			if (r == null) return;
+			nameField.setText(r.getName());
+			massField.setText(Double.toString(r.getM()));
+			xField.setText(Double.toString(r.getX()));
+			yField.setText(Double.toString(r.getY()));
+			zField.setText(Double.toString(r.getZ()));
+			vxField.setText(Double.toString(r.getVx()));
+			vyField.setText(Double.toString(r.getVy()));
+			vzField.setText(Double.toString(r.getVz()));
+		});
+
+
+		xClosed = 12;
+		xOpen = drawer.getPrefWidth() + 12;
 
 		AmbientLight ambient = new AmbientLight(Color.WHITE); // יוצר אור בשם ambient בצבע לבן
 		PointLight light = new PointLight(Color.WHITE); // יוצר מקור אור נקודתי בשם light בצבע לבן
@@ -105,7 +153,7 @@ public class MainController {
 
 
 		subScene.setCamera(camera); // מחבר את המצלמה לsubscene
-		subScene.setFill(Color.rgb(20, 20, 20)); // קובע רקע בצבע הנתון (שחור)
+		subScene.setFill(Color.rgb(0, 5, 16)); // קובע רקע בצבע הנתון (שחור)
 
 		view3DHost.getChildren().add(subScene); // מוסיף את הסצנה הפנימית לתוך מיכל העוגן במסך
 
@@ -118,6 +166,120 @@ public class MainController {
 		subScene.widthProperty().bind(view3DHost.widthProperty()); // קושר את האורך של subScene לview3DHost
 		subScene.heightProperty().bind(view3DHost.heightProperty());// אותו הדבר עם גובה
 
-		setOpen(true, false);
+	}
+
+	@FXML
+	private void onAdd() {
+		BodyRow r = readRowFromForm();
+		if (r == null) return;
+		rows.add(r);
+		clearForm();
+	}
+
+	@FXML
+	private void onUpdate() {
+		BodyRow selected = bodiesTable.getSelectionModel().getSelectedItem();
+		if (selected == null) {
+			warn("בחר גוף לעדכון");
+			return;
+		}
+
+		BodyRow updated = readRowFromForm();
+		if (updated == null) return;
+
+		int idx = rows.indexOf(selected);
+		rows.set(idx, updated);
+		bodiesTable.getSelectionModel().select(updated);
+	}
+
+	@FXML
+	private void onRemove() {
+		BodyRow selected = bodiesTable.getSelectionModel().getSelectedItem();
+		if (selected != null) rows.remove(selected);
+	}
+
+	@FXML
+	private void onClear() {
+		clearForm();
+		bodiesTable.getSelectionModel().clearSelection();
+	}
+
+	@FXML
+	private void onRun() {
+		Body[] bodies = buildBodiesArray();
+		// פה אתה קורא לפונקציה שמתחילה סימולציה עם bodies
+		// startSimulation(bodies);
+		System.out.println("Bodies count = " + bodies.length);
+	}
+
+	private Body[] buildBodiesArray() {
+		Body[] arr = new Body[rows.size()];
+		for (int i = 0; i < rows.size(); i++) {
+			BodyRow r = rows.get(i);
+			double[] place = new double[]{r.getX(), r.getY(), r.getZ()};
+			double[] v = new double[]{r.getVx(), r.getVy(), r.getVz()};
+			arr[i] = new Body(r.getName(), r.getM(), place, v);
+		}
+		return arr;
+	}
+
+	private BodyRow readRowFromForm() {
+		try {
+			String name = safe(nameField.getText());
+			double m = parse(massField, "m");
+			double x = parse(xField, "x");
+			double y = parse(yField, "y");
+			double z = parse(zField, "z");
+			double vx = parse(vxField, "vx");
+			double vy = parse(vyField, "vy");
+			double vz = parse(vzField, "vz");
+
+			if (m <= 0) {
+				warn("מסה חייבת להיות חיובית");
+				return null;
+			}
+			if (name.isEmpty()) name = "Body";
+
+			return new BodyRow(name, m, x, y, z, vx, vy, vz);
+		} catch (NumberFormatException ex) {
+			return null;
+		}
+	}
+
+	private double parse(TextField f, String label) {
+		String t = safe(f.getText());
+		if (t.isEmpty()) {
+			warn("חסר ערך בשדה: " + label);
+			throw new NumberFormatException();
+		}
+		try {
+			return Double.parseDouble(t);
+		} catch (NumberFormatException e) {
+			warn("ערך לא מספרי בשדה: " + label);
+			throw e;
+		}
+	}
+
+	private void clearForm() {
+		nameField.clear();
+		massField.clear();
+		xField.clear();
+		yField.clear();
+		zField.clear();
+		vxField.clear();
+		vyField.clear();
+		vzField.clear();
+	}
+
+	private void warn(String msg) {
+		Alert a = new Alert(Alert.AlertType.WARNING);
+		a.setHeaderText(null);
+		a.setContentText(msg);
+		a.showAndWait();
+	}
+
+	private String safe(String s) {
+		return s == null ? "" : s.trim();
 	}
 }
+

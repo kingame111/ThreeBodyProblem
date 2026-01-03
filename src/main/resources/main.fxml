@@ -1,29 +1,193 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
+<?import javafx.geometry.Point3D?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 <StackPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="org.example.MainController">
     <children>
-        <BorderPane>
-            <center>
-                <AnchorPane fx:id="view3DHost" BorderPane.alignment="CENTER"/>
-            </center>
-        </BorderPane>
-        <HBox pickOnBounds="false" StackPane.alignment="TOP_LEFT">
-            <StackPane.margin>
-                <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
-            </StackPane.margin>
+        <AnchorPane fx:id="view3DHost"/>
+        <AnchorPane StackPane.alignment="TOP_LEFT">
             <children>
-                <VBox fx:id="drawer" prefWidth="340.0" spacing="10.0" styleClass="drawer">
+                <VBox fx:id="drawer" prefWidth="340.0" spacing="10.0" styleClass="drawer" AnchorPane.bottomAnchor="0.0"
+                      AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <padding>
                         <Insets bottom="12.0" left="12.0" right="12.0" top="12.0"/>
                     </padding>
+                    <children>
+                        <Label text="N-Body Simulator" textAlignment="CENTER">
+                            <font>
+                                <Font name="System Bold" size="20.0"/>
+                            </font>
+                        </Label>
+                        <Separator prefWidth="200.0"/>
+                        <ScrollPane fitToWidth="true" pannable="true" VBox.vgrow="ALWAYS">
+                            <content>
+                                <Accordion>
+                                    <panes>
+                                        <TitledPane animated="false" text="Bodies">
+                                            <content>
+                                                <VBox prefHeight="200.0" prefWidth="100.0">
+                                                    <children>
+                                                        <TableView fx:id="bodiesTable" tableMenuButtonVisible="true">
+                                                            <columns>
+                                                                <TableColumn fx:id="colName" text="Name"
+                                                                             prefWidth="90"/>
+                                                                <TableColumn fx:id="colM" text="m" prefWidth="60"/>
+                                                                <TableColumn fx:id="colX" text="x" prefWidth="55"/>
+                                                                <TableColumn fx:id="colY" text="y" prefWidth="55"/>
+                                                                <TableColumn fx:id="colZ" text="z" prefWidth="55"/>
+                                                                <TableColumn fx:id="colVx" text="vx" prefWidth="55"/>
+                                                                <TableColumn fx:id="colVy" text="vy" prefWidth="55"/>
+                                                                <TableColumn fx:id="colVz" text="vz" prefWidth="55"/>
+                                                            </columns>
+                                                            <columnResizePolicy>
+                                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                                            </columnResizePolicy>
+                                                        </TableView>
+                                                        <Separator prefWidth="200.0"/>
+                                                        <GridPane hgap="10.0" vgap="30.0">
+                                                            <columnConstraints>
+                                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                                                            </columnConstraints>
+                                                            <rowConstraints>
+                                                                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                                                                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                                                                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                                                            </rowConstraints>
+                                                            <padding>
+                                                                <Insets bottom="8.0" left="8.0" right="8.0" top="8.0"/>
+                                                            </padding>
+                                                            <children>
+                                                                <VBox spacing="3.0">
+                                                                    <children>
+                                                                        <Label text="Name"/>
+                                                                        <TextField fx:id="nameField" promptText="Sun"/>
+                                                                    </children>
+                                                                </VBox>
+                                                                <VBox spacing="3.0" GridPane.columnIndex="1">
+                                                                    <children>
+                                                                        <Label text="Mass"/>
+                                                                        <TextField fx:id="massField" promptText="1"/>
+                                                                    </children>
+                                                                </VBox>
+                                                                <VBox spacing="3.0" GridPane.rowIndex="1">
+                                                                    <children>
+                                                                        <Label text="x"/>
+                                                                        <TextField promptText="0" fx:id="xField"/>
+                                                                    </children>
+                                                                </VBox>
+                                                                <VBox spacing="3.0" GridPane.columnIndex="1"
+                                                                      GridPane.rowIndex="1">
+                                                                    <children>
+                                                                        <Label text="y"/>
+                                                                        <TextField fx:id="yField" promptText="0"/>
+                                                                    </children>
+                                                                </VBox>
+                                                                <VBox spacing="3.0" GridPane.columnIndex="2"
+                                                                      GridPane.rowIndex="1">
+                                                                    <children>
+                                                                        <Label text="z"/>
+                                                                        <TextField fx:id="zField" promptText="0"/>
+                                                                    </children>
+                                                                </VBox>
+                                                                <VBox spacing="3.0" GridPane.rowIndex="2">
+                                                                    <children>
+                                                                        <Label text="vx"/>
+                                                                        <TextField fx:id="vxField" promptText="0"/>
+                                                                    </children>
+                                                                </VBox>
+                                                                <VBox spacing="3.0" GridPane.columnIndex="1"
+                                                                      GridPane.rowIndex="2">
+                                                                    <children>
+                                                                        <Label text="vy"/>
+                                                                        <TextField fx:id="vyField" promptText="0"/>
+                                                                    </children>
+                                                                </VBox>
+                                                                <VBox spacing="3.0" GridPane.columnIndex="2"
+                                                                      GridPane.rowIndex="2">
+                                                                    <children>
+                                                                        <Label text="vz"/>
+                                                                        <TextField fx:id="vzField" promptText="0"/>
+                                                                    </children>
+                                                                </VBox>
+                                                            </children>
+                                                        </GridPane>
+                                                        <HBox prefHeight="100.0" prefWidth="200.0">
+                                                            <children>
+                                                                <Button mnemonicParsing="false" onAction="#onAdd"
+                                                                        text="Add"/>
+                                                                <Button mnemonicParsing="false" onAction="#onUpdate"
+                                                                        text="Update"/>
+                                                                <Button mnemonicParsing="false" onAction="#onRemove"
+                                                                        text="Remove"/>
+                                                                <Button mnemonicParsing="false" onAction="#onClear"
+                                                                        text="Clear"/>
+                                                                <Button mnemonicParsing="false" onAction="#onRun"
+                                                                        text="Run"/>
+                                                            </children>
+                                                        </HBox>
+                                                    </children>
+                                                </VBox>
+                                            </content>
+                                        </TitledPane>
+                                        <TitledPane animated="false" text="untitled 2">
+                                            <content>
+                                                <GridPane>
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
+                                                                           prefWidth="100.0"/>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
+                                                                           prefWidth="100.0"/>
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                                        vgrow="SOMETIMES"/>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                                        vgrow="SOMETIMES"/>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                                        vgrow="SOMETIMES"/>
+                                                    </rowConstraints>
+                                                </GridPane>
+                                            </content>
+                                        </TitledPane>
+                                        <TitledPane animated="false" text="untitled 3">
+                                            <content>
+                                                <GridPane>
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
+                                                                           prefWidth="100.0"/>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
+                                                                           prefWidth="100.0"/>
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                                        vgrow="SOMETIMES"/>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                                        vgrow="SOMETIMES"/>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                                        vgrow="SOMETIMES"/>
+                                                    </rowConstraints>
+                                                </GridPane>
+                                            </content>
+                                        </TitledPane>
+                                    </panes>
+                                    <rotationAxis>
+                                        <Point3D/>
+                                    </rotationAxis>
+                                </Accordion>
+                            </content>
+                        </ScrollPane>
+                    </children>
                 </VBox>
-                <Button fx:id="drawerHandle" mnemonicParsing="false" onAction="#toggleDrawer" prefWidth="44.0"
-                        styleClass="drawer-handle" text="☰" textAlignment="JUSTIFY"/>
+                <Button fx:id="drawerHandle" layoutX="332.0" mnemonicParsing="false" onAction="#toggleDrawer"
+                        pickOnBounds="false" prefWidth="44.0" styleClass="drawer-handle" text="✕"
+                        textAlignment="JUSTIFY" AnchorPane.topAnchor="20.0"/>
             </children>
-        </HBox>
+        </AnchorPane>
     </children>
 </StackPane>

@@ -7,8 +7,8 @@ public class ScenarioFactory {
 
 	public static Body[] twoBodyDemo() {
 		Body[] a = {
-				new Body(new double[]{-200, 0, 0}, new double[]{0, 0.8, 0}, 5000, "A"),
-				new Body(new double[]{200, 0, 0}, new double[]{0, -0.8, 0}, 5000, "B")
+				new Body("A", 5000, new double[]{-200, 0, 0}, new double[]{0, 0.8, 0}),
+				new Body("B", 5000, new double[]{200, 0, 0}, new double[]{0, -0.8, 0})
 		};
 		return a.clone();
 	}
