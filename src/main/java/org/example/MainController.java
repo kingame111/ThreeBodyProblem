@@ -27,8 +27,8 @@ public class MainController {
 	private TextField nameField, massField, xField, yField, zField, vxField, vyField, vzField;
 
 	private final ObservableList<BodyRow> rows = FXCollections.observableArrayList();
-
-
+	// י ObservableList<BodyRow> אומר שהרשימה 'חכמה' כלומר היא יודעת לדווח כשבוצעו בה שינויים והיא מסוג BodyRow
+	// י FXCollections היא מחלקה וobservableArrayList() היא פעולה במחלקה שמחזירה לי אובייקט חדש מסוג ObservableList
 	@FXML
 	private AnchorPane view3DHost;
 
@@ -38,6 +38,8 @@ public class MainController {
 	@FXML
 	private Button drawerHandle;
 
+	private BodyViewManager viewManager;
+
 	private boolean open = true;
 
 	private double xOpen;
@@ -45,14 +47,22 @@ public class MainController {
 
 	@FXML
 	private void toggleDrawer() {
-		setOpen(!open, true); // אם לא פתוח תפתח ותנפיש
+		setOpen(!open, true);// אם לא פתוח תפתח ותנפיש
 	}
 
 	private void setOpen(boolean shouldOpen, boolean animate) {
 		open = shouldOpen;
 
 		double w = drawer.getWidth(); // נותן את הרוחב המועדף ששמתי לdrawer
+
+		if (w <= 0) {
+			w = drawer.getPrefWidth();
+		}
+
 		double targetX = open ? 0 : -w;   //אם open הוא true אז לא זזים אם הוא false אז זזים w (מינוס בגלל שזזים לכיוון הנגדי)
+
+
+
 
 		drawerHandle.setLayoutX(shouldOpen ? xOpen : xClosed);
 		drawerHandle.setText(shouldOpen ? "✕" : "☰");
@@ -82,28 +92,32 @@ public class MainController {
 		twoSphereDemo[0].setTranslateZ(100);
 		return twoSphereDemo;
 	}
+	// כבר לא שימושי אבל אין סיבה למחוק
 
 
 	@FXML
 	public void initialize() {
 
+
 		Group world = new Group();
+
 		world.setScaleY(-1); // ברירת המחדל של ציר הY היא כלפי מטה לכן אני הופך אותו
 
 		Group spheres = new Group();
-		Sphere[] twoBodyDemoSpheres = twoBodyDemoImplementer();
-		spheres.getChildren().addAll(twoBodyDemoSpheres);
-		spheres.setScaleY(-1);
 		world.getChildren().addAll(spheres);
+		viewManager = new BodyViewManager(spheres, 5); // להוסיף תגובה
 
-		/*Sphere spheres = new Sphere(60); // יוצר עיגול עם רדיוס 60
+		/*
+		Sphere spheres = new Sphere(60); // יוצר עיגול עם רדיוס 60
 		PhongMaterial material = new PhongMaterial(); // יוצר חומר חדש בשם material שמאוחר יותר ניתן לשייך לצורה
 		material.setDiffuseColor(Color.DODGERBLUE); //קובע את הצבע של החומר material ל-DODGERBLUE
 		spheres.setMaterial(material); // קובע את החומר של spheres לmaterial
 		world.getChildren().add(spheres); // מוסיף את spheres לworld
 		*/
 
-		bodiesTable.setItems(rows);
+		bodiesTable.setItems(rows); // י bodiesTable זה הid של הtableView
+		// השורה הזאת מחברת בין הטבלה (bodiesTable) לבין הרשימה הכחמה של השורות (rows)
+		// מה שהחיבור נותן לי זה שכאשר rows משתנה הטבלה מתעדכנת לבד
 
 		colName.setCellValueFactory(c -> c.getValue().nameProperty());
 		colM.setCellValueFactory(c -> c.getValue().mProperty());
@@ -113,8 +127,17 @@ public class MainController {
 		colVx.setCellValueFactory(c -> c.getValue().vxProperty());
 		colVy.setCellValueFactory(c -> c.getValue().vyProperty());
 		colVz.setCellValueFactory(c -> c.getValue().vzProperty());
+		/*
+		אסביר בעזרת העמודה m:
+		יש עמודה שלמה של ערכי m אז איך javafx יודע לאיזה ערך m לגשת?
+		לכן javafx שולח פרמטר c שמחזיק מידע על התא שהיא צריכה לגשת אליו ובעזרת getValue היא מחלצת את השורה
+		הפעולה מחזירה את הproperty של m כדי שהטבלה תוכל להאזין לשינויים בm ולהתעדכן בהתאם
 
-		// קליק על שורה -> מילוי הטופס
+		הסימון <- הוא קיצור שחוסך לי כאב ראש:
+		 מה שהוא עושה זה אומר לפעולה לקבל משתנה c ולהחזיר c.getValue().vyProperty()
+		 */
+
+
 		bodiesTable.getSelectionModel().selectedItemProperty().addListener((obs, oldRow, r) -> {
 			if (r == null) return;
 			nameField.setText(r.getName());
@@ -126,6 +149,12 @@ public class MainController {
 			vyField.setText(Double.toString(r.getVy()));
 			vzField.setText(Double.toString(r.getVz()));
 		});
+		/*
+		י SelectionModel זה אובייקט שמצביע על השורה שהמשתמש כרגע בוחר
+		(יכול להיות שורה או שום שורה) כך שאנחנו יודעים איזה שורה זאת
+		י selectedItemProperty מחזיק את הproperty של השורה הזאת
+		י addListener בודק אם בוצע שינוי בselectedItemProperty ואם אכן בוצע שינוי הוא מפעיל את הקוד שבתוכו
+		*/
 
 
 		xClosed = 12;
@@ -161,72 +190,93 @@ public class MainController {
 		AnchorPane.setRightAnchor(subScene, 0.0); // מצמיד את הsubScene לימין
 		AnchorPane.setBottomAnchor(subScene, 0.0); // מצמיד את הsubScene למטה
 		AnchorPane.setLeftAnchor(subScene, 0.0); //מצמיד את הsubScene לשמאל
-		// בסופו של דבר יוצא שהsubscene ממלא את כל הview3DHost (רווח) (anchorPane)
+		// בסופו של דבר יוצא שהsubScene ממלא את כל הview3DHost (רווח) (anchorPane)
 
 		subScene.widthProperty().bind(view3DHost.widthProperty()); // קושר את האורך של subScene לview3DHost
 		subScene.heightProperty().bind(view3DHost.heightProperty());// אותו הדבר עם גובה
 
+		setOpen(true,false);
 	}
 
 	@FXML
 	private void onAdd() {
-		BodyRow r = readRowFromForm();
+		BodyRow r = readRowFromForm(); // י r שווה לערכים שהמשתמש הכניס לgridPane
 		if (r == null) return;
 		rows.add(r);
 		clearForm();
 	}
+	// מוסיף שורה עם נתונים לרשימה 'החכמה' (rows) של השורות ובגלל שהיא מקושרת לטבלה אז זה מוסיף גם לטבלה את שורת הנתונים
 
 	@FXML
 	private void onUpdate() {
 		BodyRow selected = bodiesTable.getSelectionModel().getSelectedItem();
+		// י getSelectionModel מחזיר את השורה שכרגע בחורה וgetSelectedItem מחזיר את הproperty של השורה הבחורה
 		if (selected == null) {
 			warn("בחר גוף לעדכון");
 			return;
 		}
 
-		BodyRow updated = readRowFromForm();
-		if (updated == null) return;
+		BodyRow updated = readRowFromForm(); // י updated שווה לערכים שהמשתמש הכניס לgridPane
+		if (updated == null) {
+			return;
+		}
 
-		int idx = rows.indexOf(selected);
-		rows.set(idx, updated);
-		bodiesTable.getSelectionModel().select(updated);
+		int idx = rows.indexOf(selected); // י idx שווה לאינדקס של השורה ברשימת השורות
+		rows.set(idx, updated); // מיישם את הערכים החדשים
+		bodiesTable.getSelectionModel().select(updated); // מסמן את השורה ששונתה כדי שהמשתמש יוכל לראות שבוצע שינוי
 	}
 
 	@FXML
 	private void onRemove() {
 		BodyRow selected = bodiesTable.getSelectionModel().getSelectedItem();
-		if (selected != null) rows.remove(selected);
+		if (selected != null) {
+			rows.remove(selected);
+		}
 	}
+	// מוחק את השורה שנבחרה
 
 	@FXML
 	private void onClear() {
 		clearForm();
 		bodiesTable.getSelectionModel().clearSelection();
 	}
+	// מוחק את כל הערכים בgridPane
 
 	@FXML
 	private void onRun() {
+
+		if (rows.isEmpty()) {
+			warn("אין גופים להרצה");
+			return;
+		}
+
 		Body[] bodies = buildBodiesArray();
-		// פה אתה קורא לפונקציה שמתחילה סימולציה עם bodies
-		// startSimulation(bodies);
-		System.out.println("Bodies count = " + bodies.length);
+
+		// זה יוצר את מערך הספירות לפי מערך הגופים
+		viewManager.bind(bodies);
+
+		new Thread(() -> {
+			Simulation.simulator(0.0, 1000.0, bodies, viewManager);
+		}, "sim-thread").start();
 	}
+	// מה שיגרום לשימולציה לרוץ
 
 	private Body[] buildBodiesArray() {
 		Body[] arr = new Body[rows.size()];
 		for (int i = 0; i < rows.size(); i++) {
-			BodyRow r = rows.get(i);
+			BodyRow r = rows.get(i); // שומר את הנתונים של השורה i שבrows בr
 			double[] place = new double[]{r.getX(), r.getY(), r.getZ()};
 			double[] v = new double[]{r.getVx(), r.getVy(), r.getVz()};
 			arr[i] = new Body(r.getName(), r.getM(), place, v);
 		}
 		return arr;
 	}
+	// יוצר מערך של גופים על בסיס הנתונים ברשימה 'החכמה' (rows)
 
 	private BodyRow readRowFromForm() {
 		try {
-			String name = safe(nameField.getText());
-			double m = parse(massField, "m");
+			String name = safe(nameField.getText()); // י safe מוגדר בהמשך
+			double m = parse(massField, "m"); // י parse מוגדר בהמשך
 			double x = parse(xField, "x");
 			double y = parse(yField, "y");
 			double z = parse(zField, "z");
@@ -235,13 +285,16 @@ public class MainController {
 			double vz = parse(vzField, "vz");
 
 			if (m <= 0) {
-				warn("מסה חייבת להיות חיובית");
+				warn("Enter a positive Mass value");
 				return null;
 			}
-			if (name.isEmpty()) name = "Body";
+			if (name.isEmpty()) {
+				warn("Enter a name");
+				return null;
+			}
 
 			return new BodyRow(name, m, x, y, z, vx, vy, vz);
-		} catch (NumberFormatException ex) {
+		} catch (NumberFormatException ex) { // בו
 			return null;
 		}
 	}
@@ -249,13 +302,13 @@ public class MainController {
 	private double parse(TextField f, String label) {
 		String t = safe(f.getText());
 		if (t.isEmpty()) {
-			warn("חסר ערך בשדה: " + label);
+			warn("Value is missing in field: " + label);
 			throw new NumberFormatException();
 		}
 		try {
 			return Double.parseDouble(t);
 		} catch (NumberFormatException e) {
-			warn("ערך לא מספרי בשדה: " + label);
+			warn("Non-numeric value in field: " + label);
 			throw e;
 		}
 	}
@@ -277,9 +330,10 @@ public class MainController {
 		a.setContentText(msg);
 		a.showAndWait();
 	}
+	// פותח חלון אזהרה אם התוכן שwarn מקבל
 
 	private String safe(String s) {
-		return s == null ? "" : s.trim();
+		return s == null ? "" : s.trim(); // י trim מוחק אם יש רווחים בסוף ובהתחלה
 	}
 }
 

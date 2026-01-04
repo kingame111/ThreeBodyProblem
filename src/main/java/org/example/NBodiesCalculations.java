@@ -61,6 +61,8 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 
 		for (int i = 0; i < bodiesNum; i++) {
 			int i6 = 6 * i;
+			int i3 = 3 * i;
+
 			double xi = state[i6]; // ערך מיקום הx של גוף i
 			double yi = state[i6 + 1]; // ערך מיקום הy של גוף i
 			double zi = state[i6 + 2]; // ערך מיקום הz של גוף i
@@ -80,9 +82,11 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 
 				double acc = Body.G * bodies[j].getM() * invR3; // נוסחה לחישוב תאוצה
 
-				a[3 * i] += acc * dx; // dx אמור להיות חלקי r כדי שיהיה רק עם כיוון ללא גודל אך זה נעשה בinvR3
-				a[3 * i + 1] += acc * dy; // dy אמור להיות חלקי r כדי שיהיה רק עם כיוון ללא גודל אך זה נעשה בinvR3
-				a[3 * i + 2] += acc * dz; // dz אמור להיות חלקי r כדי שיהיה רק עם כיוון ללא גודל אך זה נעשה בinvR3
+
+
+				a[i3] += acc * dx; // dx אמור להיות חלקי r כדי שיהיה רק עם כיוון ללא גודל אך זה נעשה בinvR3
+				a[i3 + 1] += acc * dy; // dy אמור להיות חלקי r כדי שיהיה רק עם כיוון ללא גודל אך זה נעשה בinvR3
+				a[i3 + 2] += acc * dz; // dz אמור להיות חלקי r כדי שיהיה רק עם כיוון ללא גודל אך זה נעשה בinvR3
 
 			}
 		}
@@ -129,6 +133,21 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 		}
 		return stateDer;
 	}
+
+	public static void applyStateToBodies(double[] y, Body[] bodies) {
+
+		if (y.length != 6 * bodies.length) {
+			throw new IllegalArgumentException(
+					"State length mismatch: expected " + (6 * bodies.length) + ", got " + y.length
+			);
+		}
+
+		for (int i = 0; i < bodies.length; i++) {
+			bodies[i].setR(y[6*i], y[6*i + 1], y[6*i + 2]);
+			bodies[i].setV(y[6*i + 3], y[6*i + 4], y[6*i + 5]);
+		}
+	}
+
 
 
 }
