@@ -72,10 +72,12 @@ public final class BodyViewManager {
 	}
 
 	public Sphere[] getSpheres() {
+
 		return spheres;
 	}
 
 	public void setDefaultRadius(double defaultRadius) {
+
 		this.defaultRadius = defaultRadius;
 	}
 

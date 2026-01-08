@@ -1,0 +1,96 @@
+@startuml
+
+left to right direction
+skinparam componentStyle rectangle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam nodesep 30
+skinparam ranksep 25
+
+actor "User" as USER
+
+package "Bootstrap" as PBOOT {
+  [Main] as MAIN
+}
+
+package "UI (JavaFX + FXML)" as PUI {
+  [main.fxml] as FXML
+  [MainController] as CTRL
+  [BodyRow] as ROW
+}
+
+package "Simulation Core" as PCOR {
+  [Simulation] as SIM
+  [NBodiesCalculations] as CALC
+  [ScenarioFactory] as SCEN
+  [Body] as BODY
+}
+
+package "3D Visualization" as PVIS {
+  [BodyViewManager] as VIEW
+}
+
+package "Dependencies" as PEXT {
+  [JavaFX Runtime] as JFX
+  [Hipparchus (ODE)] as HIP
+  [Gradle] as GRADLE
+}
+
+' ===== I/O notes (kept short) =====
+note bottom of PUI
+ROLE: UI input + run control
+IN: BodyRow + buttons
+OUT: Body[] + run commands
+end note
+
+note bottom of PCOR
+ROLE: compute motion
+IN: Body[] initial state
+OUT: updated Body positions
+end note
+
+note bottom of PVIS
+ROLE: render in 3D
+IN: bind(Body[]) + render() calls
+OUT: updated 3D scene
+end note
+
+note bottom of PEXT
+ROLE: external libraries + build
+IN: build.gradle configuration
+OUT: JavaFX + Hipparchus available at build/run
+end note
+
+note bottom of PBOOT
+ROLE: launch application
+IN: none
+OUT: loads UI (FXML)
+end note
+
+
+' ===== Layout hints =====
+PBOOT -[hidden]-> PUI
+PUI -[hidden]-> PCOR
+PCOR -[hidden]-> PVIS
+PUI -down[hidden]-> PEXT
+PCOR -down[hidden]-> PEXT
+PVIS -down[hidden]-> PEXT
+
+' ===== Minimal relations (only essential) =====
+USER --> CTRL : input + Run
+MAIN --> FXML : loads
+FXML --> CTRL : binds
+
+CTRL --> SIM : Body[] + start
+SIM --> VIEW : \n \n bind(Body[])+ render()
+SIM --> CALC : step + derivatives
+CALC --> BODY : uses mass, pos, vel
+SCEN ..> BODY : creates demo Body[]
+
+PUI  ..> JFX
+PVIS ..> JFX
+SIM  ..> HIP
+GRADLE ..> JFX
+GRADLE ..> HIP
+
+@enduml
