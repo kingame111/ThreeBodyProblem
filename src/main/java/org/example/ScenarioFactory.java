@@ -13,6 +13,5 @@ public class ScenarioFactory {
 		return a.clone();
 	}
 
-
-
 }
+// TODO add more scenarios

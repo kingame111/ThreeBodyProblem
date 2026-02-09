@@ -17,7 +17,7 @@ public class Simulation {
 		double absTol = 1e-10;  // 1e-10 (10⁻¹⁰)
 		double relTol = 1e-10;  // 1e-10 (10⁻¹⁰)
 
-		double[] y0 = NBodiesCalculations.StateSort(bodies);
+		double[] y0 = NBodiesCalculations.StateSort(bodies); // מסדר את מערך state למקרה שלא בא מסודר
 
 		DormandPrince853Integrator integrator =
 				new DormandPrince853Integrator(minStep, maxStep, absTol, relTol);
@@ -28,7 +28,7 @@ public class Simulation {
 		integrator.addStepHandler(interpolator -> {
 			steps[0]++;
 
-			if (steps[0] % uiEvery != 0){
+			if (steps[0] % uiEvery != 0) {
 				return;
 			}
 
