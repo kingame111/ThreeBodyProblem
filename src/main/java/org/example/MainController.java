@@ -16,17 +16,15 @@ import javafx.util.Duration;
 
 public class MainController {
 
+	private final ObservableList<BodyRow> rows = FXCollections.observableArrayList();
 	@FXML
 	private TableView<BodyRow> bodiesTable;
 	@FXML
 	private TableColumn<BodyRow, String> colName;
 	@FXML
 	private TableColumn<BodyRow, Number> colM, colX, colY, colZ, colVx, colVy, colVz;
-
 	@FXML
 	private TextField nameField, massField, xField, yField, zField, vxField, vyField, vzField;
-
-	private final ObservableList<BodyRow> rows = FXCollections.observableArrayList();
 	// י ObservableList<BodyRow> אומר שהרשימה 'חכמה' כלומר היא יודעת לדווח כשבוצעו בה שינויים והיא מסוג BodyRow
 	// י FXCollections היא מחלקה וobservableArrayList() היא פעולה במחלקה שמחזירה לי אובייקט חדש מסוג ObservableList
 	@FXML
@@ -45,6 +43,20 @@ public class MainController {
 	private double xOpen;
 	private double xClosed;
 
+	// כבר לא שימושי אבל אין סיבה למחוק
+	public static Sphere[] twoBodyDemoImplementer() {
+		Sphere twoSphereDemo[] = new Sphere[2];
+		for (int i = 0; i < ScenarioFactory.twoBodyDemo().length; i++) {
+			twoSphereDemo[i] = new Sphere(30);
+			PhongMaterial material1 = new PhongMaterial();
+			material1.setDiffuseColor(Color.PURPLE);
+			twoSphereDemo[i].setMaterial(material1);
+		}
+		twoSphereDemo[0].setTranslateX(100);
+		twoSphereDemo[0].setTranslateZ(100);
+		return twoSphereDemo;
+	}
+
 	@FXML
 	private void toggleDrawer() {
 		setOpen(!open, true);// אם לא פתוח תפתח ותנפיש
@@ -60,8 +72,6 @@ public class MainController {
 		}
 
 		double targetX = open ? 0 : -w;   //אם open הוא true אז לא זזים אם הוא false אז זזים w (מינוס בגלל שזזים לכיוון הנגדי)
-
-
 
 
 		drawerHandle.setLayoutX(shouldOpen ? xOpen : xClosed);
@@ -80,21 +90,6 @@ public class MainController {
 
 	}
 
-	public static Sphere[] twoBodyDemoImplementer() {
-		Sphere twoSphereDemo[] = new Sphere[2];
-		for (int i = 0; i < ScenarioFactory.twoBodyDemo().length; i++) {
-			twoSphereDemo[i] = new Sphere(30);
-			PhongMaterial material1 = new PhongMaterial();
-			material1.setDiffuseColor(Color.PURPLE);
-			twoSphereDemo[i].setMaterial(material1);
-		}
-		twoSphereDemo[0].setTranslateX(100);
-		twoSphereDemo[0].setTranslateZ(100);
-		return twoSphereDemo;
-	}
-	// כבר לא שימושי אבל אין סיבה למחוק
-
-
 	@FXML
 	public void initialize() {
 
@@ -105,7 +100,7 @@ public class MainController {
 
 		Group spheres = new Group();
 		world.getChildren().addAll(spheres);
-		viewManager = new BodyViewManager(spheres, 5); // להוסיף תגובה
+		viewManager = new BodyViewManager(spheres, 5); // TODO להוסיף תגובה
 
 		/*
 		Sphere spheres = new Sphere(60); // יוצר עיגול עם רדיוס 60
@@ -128,7 +123,7 @@ public class MainController {
 		colVy.setCellValueFactory(c -> c.getValue().vyProperty());
 		colVz.setCellValueFactory(c -> c.getValue().vzProperty());
 		/*
-		אסביר בעזרת העמודה m:
+		אסביר בעזרת העמודה M:
 		יש עמודה שלמה של ערכי m אז איך javafx יודע לאיזה ערך m לגשת?
 		לכן javafx שולח פרמטר c שמחזיק מידע על התא שהיא צריכה לגשת אליו ובעזרת getValue היא מחלצת את השורה
 		הפעולה מחזירה את הproperty של m כדי שהטבלה תוכל להאזין לשינויים בm ולהתעדכן בהתאם
@@ -195,7 +190,7 @@ public class MainController {
 		subScene.widthProperty().bind(view3DHost.widthProperty()); // קושר את האורך של subScene לview3DHost
 		subScene.heightProperty().bind(view3DHost.heightProperty());// אותו הדבר עם גובה
 
-		setOpen(true,false);
+		setOpen(true, false);
 	}
 
 	@FXML
@@ -258,8 +253,9 @@ public class MainController {
 		new Thread(() -> {
 			Simulation.simulator(0.0, 1000.0, bodies, viewManager);
 		}, "sim-thread").start();
+		// מה שיגרום לסימולציה לרוץ
 	}
-	// מה שיגרום לשימולציה לרוץ
+
 
 	private Body[] buildBodiesArray() {
 		Body[] arr = new Body[rows.size()];

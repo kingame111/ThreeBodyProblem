@@ -7,7 +7,6 @@ public class TimeManager {
 
 	// פעולה המוסיפה לרשימת הפריימים פריים
 	public void record(double t, double[] pos, double[] vel) {
-
 		frames.add(new FrameSnapshot(t, pos, vel));
 	}
 
