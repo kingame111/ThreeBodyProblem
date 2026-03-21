@@ -1,6 +1,5 @@
 package org.example;
 
-import javafx.application.Platform;
 import org.hipparchus.ode.ODEState;
 import org.hipparchus.ode.ODEStateAndDerivative;
 import org.hipparchus.ode.OrdinaryDifferentialEquation;
@@ -8,9 +7,9 @@ import org.hipparchus.ode.nonstiff.DormandPrince853Integrator;
 
 public class Simulation {
 
-	public static double[] simulator(double tStart, double tEnd, Body[] bodies, BodyViewManager viewManager) {
+	public static double[] runSimulation(double tStart, double tEnd, Body[] bodies, TimeManager timeManager) {
 
-		OrdinaryDifferentialEquation ode = new NBodiesCalculations(bodies);
+		OrdinaryDifferentialEquation ode = new NBodiesCalculations(bodies); // TODO להוסיף תגובה
 
 		double minStep = 1e-6;   // 1e-6 (10⁻⁶)
 		double maxStep = 1.0;
@@ -18,6 +17,10 @@ public class Simulation {
 		double relTol = 1e-10;  // 1e-10 (10⁻¹⁰)
 
 		double[] y0 = NBodiesCalculations.StateSort(bodies); // מסדר את מערך state למקרה שלא בא מסודר
+
+		double[] pos0 = extractPositions(y0, bodies.length);
+		double[] vel0 = extractVelocities(y0, bodies.length);
+		timeManager.record(tStart, pos0, vel0);
 
 		DormandPrince853Integrator integrator =
 				new DormandPrince853Integrator(minStep, maxStep, absTol, relTol);
@@ -32,16 +35,13 @@ public class Simulation {
 				return;
 			}
 
-			// לוקחים state נוכחי
 			double[] y = interpolator.getCurrentState().getPrimaryState();
-
-			// מעתיקים כדי שלא יהיה race בין Threads
 			double[] yCopy = y.clone();
 
-			Platform.runLater(() -> {
-				NBodiesCalculations.applyStateToBodies(yCopy, bodies);
-				viewManager.render();
-			});
+			double[] pos = extractPositions(yCopy, bodies.length);
+			double[] vel = extractVelocities(yCopy, bodies.length);
+
+			timeManager.record(interpolator.getCurrentState().getTime(), pos, vel);
 		});
 
 		ODEState initial = new ODEState(tStart, y0);
@@ -50,10 +50,9 @@ public class Simulation {
 		double[] yEnd = finalState.getPrimaryState();
 		double[] yEndCopy = yEnd.clone();
 
-		Platform.runLater(() -> {
-			NBodiesCalculations.applyStateToBodies(yEndCopy, bodies);
-			viewManager.render();
-		});
+		double[] posEnd = extractPositions(yEndCopy, bodies.length);
+		double[] velEnd = extractVelocities(yEndCopy, bodies.length);
+		timeManager.record(finalState.getTime(), posEnd, velEnd);
 
 		return yEnd;
 	}
@@ -84,6 +83,30 @@ public class Simulation {
 		}
 	}
 
-	public static void energyCalc() {
+	public static void energyCalc() { // י TODO להוסיף פעולה של שמחשבת את האנרגיה
+	}
+
+	private static double[] extractPositions(double[] state, int bodyCount) {
+		double[] pos = new double[bodyCount * 3];
+		for (int i = 0; i < bodyCount; i++) {
+			int s = 6 * i;
+			int p = 3 * i;
+			pos[p] = state[s];
+			pos[p + 1] = state[s + 1];
+			pos[p + 2] = state[s + 2];
+		}
+		return pos;
+	}
+
+	private static double[] extractVelocities(double[] state, int bodyCount) {
+		double[] vel = new double[bodyCount * 3];
+		for (int i = 0; i < bodyCount; i++) {
+			int s = 6 * i;
+			int v = 3 * i;
+			vel[v] = state[s + 3];
+			vel[v + 1] = state[s + 4];
+			vel[v + 2] = state[s + 5];
+		}
+		return vel;
 	}
 }

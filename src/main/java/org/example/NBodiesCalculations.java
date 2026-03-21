@@ -9,6 +9,7 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 	private final Body[] bodies;
 	private final double[] a; // התאוצות של הגופים השונים בצירים השונים
 	private final double[] stateDer; // הנגזרת של state
+	//י TODO להוסיף softening לכל החישובים
 
 
 	// בנאי
@@ -36,14 +37,19 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 		return state;
 	}
 
-	// נוסחה לחישוב מרחק בריבוע (משאירים את הריבוע מטעמי נוחות)
-	public double distance2(double x1, double y1, double z1, double x2, double y2, double z2) {
-		double dx = x1 - x2;
-		double dy = y1 - y2;
-		double dz = z1 - z2;
-		return dx * dx + dy * dy + dz * dz;
-	}
+	public static void applyStateToBodies(double[] y, Body[] bodies) {
 
+		if (y.length != 6 * bodies.length) {
+			throw new IllegalArgumentException(
+					"State length mismatch: expected " + (6 * bodies.length) + ", got " + y.length
+			);
+		}
+
+		for (int i = 0; i < bodies.length; i++) {
+			bodies[i].setR(y[6 * i], y[6 * i + 1], y[6 * i + 2]);
+			bodies[i].setV(y[6 * i + 3], y[6 * i + 4], y[6 * i + 5]);
+		}
+	}
 
 	// פעולה המחשבת תאוצה של גוף
 	public void accelerationCalc(double[] state) {
@@ -76,12 +82,11 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 				double dy = state[j6 + 1] - yi;
 				double dz = state[j6 + 2] - zi;
 
-				double r2 = dx*dx + dy*dy + dz*dz + softening2; //  מרחק בריבוע בין שני גופים + softening
+				double r2 = dx * dx + dy * dy + dz * dz + softening2; //  מרחק בריבוע בין שני גופים + softening
 				double invR = 1.0 / Math.sqrt(r2); // נוצר בשביל המשתנה הבא
 				double invR3 = invR * invR * invR; //    נוצר בשביל סדר ויעילות| פירוט לגבי הסיבה ללמה המשתנה בשלישית בעוד מספר שורות
 
 				double acc = Body.G * bodies[j].getM() * invR3; // נוסחה לחישוב תאוצה
-
 
 
 				a[i3] += acc * dx; // dx אמור להיות חלקי r כדי שיהיה רק עם כיוון ללא גודל אך זה נעשה בinvR3
@@ -91,7 +96,6 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 			}
 		}
 	}
-
 
 	@Override
 	public int getDimension() {
@@ -133,21 +137,6 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 		}
 		return stateDer;
 	}
-
-	public static void applyStateToBodies(double[] y, Body[] bodies) {
-
-		if (y.length != 6 * bodies.length) {
-			throw new IllegalArgumentException(
-					"State length mismatch: expected " + (6 * bodies.length) + ", got " + y.length
-			);
-		}
-
-		for (int i = 0; i < bodies.length; i++) {
-			bodies[i].setR(y[6*i], y[6*i + 1], y[6*i + 2]);
-			bodies[i].setV(y[6*i + 3], y[6*i + 4], y[6*i + 5]);
-		}
-	}
-
 
 
 }

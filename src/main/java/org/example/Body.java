@@ -64,11 +64,6 @@ public class Body {
 		return m;
 	}
 
-	public String getName() {
-		return name;
-	}
-// ---setters---
-
 	public void setM(double m) {
 		if (m > 0) {
 			this.m = m;
@@ -76,7 +71,11 @@ public class Body {
 			throw new IllegalArgumentException("יש לתת למסה ערך חיובי");
 		}
 	}
+// ---setters---
 
+	public String getName() {
+		return name;
+	}
 
 	public void setR(double x, double y, double z) {
 		this.place[0] = x;
@@ -104,33 +103,6 @@ public class Body {
 		return Fg;
 	}
 
-	// פעולה המחשבת את סך הכוחות הפועלים על האובייקט בn גופים
-	public double[] totalGravitationalForce(Body target, Body[] bodies) {
-		double[] Fg = new double[3];
-
-		for (int i = 0; i < bodies.length; i++) {
-
-			if (target == bodies[i]) {
-				continue;
-			}
-
-			double sqrtD, d, dX, dY, dZ, m;
-			dX = bodies[i].getX() - target.getX();
-			dY = bodies[i].getY() - target.getY();
-			dZ = bodies[i].getZ() - target.getZ();
-			m = target.getM() * bodies[i].getM();
-			d = (dX * dX) + (dY * dY) + (dZ * dZ);
-			sqrtD = Math.sqrt(d);
-
-			double magnitude = (G * m) / d; // נוסחאת גודל כוח כבידה
-
-			Fg[0] = Fg[0] + (magnitude * dX / sqrtD);
-			Fg[1] = Fg[1] + (magnitude * dY / sqrtD);
-			Fg[2] = Fg[2] + (magnitude * dZ / sqrtD);
-
-		}
-		return Fg;
-	}
 
 	/*
 	 פעולה ההופכת את נתוני הגוף לString על פי String שהי מקבלת
@@ -156,23 +128,5 @@ public class Body {
 		}
 	}
 
-	/*
-	פעולה המדפיסה את כל הנתונים על האובייקט
-	 */
-	public void printId() {
-		System.out.println("name: " + name);
-		System.out.println("position: " + toString("place"));
-		System.out.println("velocity: " + toString("v"));
-		System.out.println("mass: " + toString("m"));
-	}
 
-	/*
-	פעולה המחזירה את כל הנתונים על האובייקט
-	 */
-	public String returnId() {
-		return "name: " + name + "\n" +
-				"position: " + toString("place") + "\n" +
-				"velocity: " + toString("v") + "\n" +
-				"mass: " + toString("m");
-	}
 }

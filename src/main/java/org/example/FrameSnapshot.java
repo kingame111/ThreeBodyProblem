@@ -26,10 +26,34 @@ public final class FrameSnapshot {
 		System.arraycopy(vel, 0, this.vel, 0, vel.length);
 	}
 
-	// פעולה המחזריה את הזמן של הפריים
 	public double getTime() {
 		return t;
 	}
+
+	public double getX(int i) {
+		return pos[3 * i];
+	}
+
+	public double getY(int i) {
+		return pos[3 * i + 1];
+	}
+
+	public double getZ(int i) {
+		return pos[3 * i + 2];
+	}
+
+	public double getVx(int i) {
+		return vel[3 * i];
+	}
+
+	public double getVy(int i) {
+		return vel[3 * i + 1];
+	}
+
+	public double getVz(int i) {
+		return vel[3 * i + 2];
+	}
+
 
 	// פעולה המחזירה את מספר הגופים בפריים
 	public int getBodyNum() {

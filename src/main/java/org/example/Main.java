@@ -16,7 +16,7 @@ public class Main extends Application {
 	public void start(Stage stage) throws Exception {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/main.fxml"));
 		Scene scene = new Scene(loader.load(), 600, 400);
-		stage.setTitle("Hello FXML");
+		stage.setTitle("N bodies simulation");
 		stage.setScene(scene);
 		stage.show();
 	}

@@ -15,7 +15,7 @@ public final class BodyViewManager {
 
 	private final Group world3D;
 
-	private final Random rand = new Random(); // על פעם שיקרא הוא יחזיר ערך חדש
+	private final Random rand = new Random(); // משתנה מסוג רנדום שמחזיר כל קריאה מספר רנדומלי חדש
 
 	private Sphere[] spheres = new Sphere[0];
 	private Body[] bodies = new Body[0];
@@ -39,6 +39,7 @@ public final class BodyViewManager {
 		this.spheres = new Sphere[bodies.length];
 
 		world3D.getChildren().clear();
+
 
 		for (int i = 0; i < bodies.length; i++) {
 			Sphere s = new Sphere(defaultRadius);
@@ -66,11 +67,7 @@ public final class BodyViewManager {
 		}
 	}
 
-	// TODO לעשות שלכל גוף יהיה צבע שונה
-	/*
-	  אופציונלי: להחליף חומר (צבע) לכל גוף לפי אינדקס
-	  לקרוא לזה אחרי bind אם בא לך צבעים שונים
-	 */
+
 	public void setMaterial(int index, PhongMaterial material) {
 		if (index < 0 || index >= spheres.length) {
 			return;

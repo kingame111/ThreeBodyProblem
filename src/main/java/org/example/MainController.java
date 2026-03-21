@@ -2,6 +2,7 @@ package org.example;
 
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -10,8 +11,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Sphere;
 import javafx.util.Duration;
 
 public class MainController {
@@ -38,24 +37,15 @@ public class MainController {
 
 	private BodyViewManager viewManager;
 
+	private TimeManager timeManager;
+
+	private FramePlayer framePlayer;
+
 	private boolean open = true;
 
 	private double xOpen;
 	private double xClosed;
 
-	// כבר לא שימושי אבל אין סיבה למחוק
-	public static Sphere[] twoBodyDemoImplementer() {
-		Sphere twoSphereDemo[] = new Sphere[2];
-		for (int i = 0; i < ScenarioFactory.twoBodyDemo().length; i++) {
-			twoSphereDemo[i] = new Sphere(30);
-			PhongMaterial material1 = new PhongMaterial();
-			material1.setDiffuseColor(Color.PURPLE);
-			twoSphereDemo[i].setMaterial(material1);
-		}
-		twoSphereDemo[0].setTranslateX(100);
-		twoSphereDemo[0].setTranslateZ(100);
-		return twoSphereDemo;
-	}
 
 	@FXML
 	private void toggleDrawer() {
@@ -240,23 +230,45 @@ public class MainController {
 	@FXML
 	private void onRun() {
 
+		if (framePlayer != null) { // עוצר ניגון קודם במידה ויש
+			framePlayer.stop();
+		}
+
 		if (rows.isEmpty()) {
 			warn("אין גופים להרצה");
 			return;
 		}
 
-		Body[] bodies = buildBodiesArray();
-
-		// זה יוצר את מערך הספירות לפי מערך הגופים
+		Body[] bodies = buildBodiesArray(); // יוצר את מערך הספירות לפי מערך הגופים
 		viewManager.bind(bodies);
 
+		timeManager = new TimeManager();
+
+		framePlayer = new FramePlayer(timeManager);
+
 		new Thread(() -> {
-			Simulation.simulator(0.0, 1000.0, bodies, viewManager);
+			Simulation.runSimulation(0.0, 1000.0, bodies, timeManager);
+
+			Platform.runLater(()->{
+
+				framePlayer.setFps(60);
+
+
+				framePlayer.play(frame -> {
+
+					for (int i = 0; i < bodies.length; i++) {
+						bodies[i].setR(frame.getX(i), frame.getY(i), frame.getZ(i));
+						bodies[i].setV(frame.getVx(i), frame.getVy(i), frame.getVz(i));
+					}
+					viewManager.render();
+				});
+			});
 		}, "sim-thread").start();
 		// מה שיגרום לסימולציה לרוץ
 	}
 
 
+	// יוצר מערך של גופים על בסיס הנתונים ברשימה 'החכמה' (rows)
 	private Body[] buildBodiesArray() {
 		Body[] arr = new Body[rows.size()];
 		for (int i = 0; i < rows.size(); i++) {
@@ -267,7 +279,7 @@ public class MainController {
 		}
 		return arr;
 	}
-	// יוצר מערך של גופים על בסיס הנתונים ברשימה 'החכמה' (rows)
+
 
 	private BodyRow readRowFromForm() {
 		try {
@@ -330,6 +342,15 @@ public class MainController {
 
 	private String safe(String s) {
 		return s == null ? "" : s.trim(); // י trim מוחק אם יש רווחים בסוף ובהתחלה
+	}
+
+	// פעולה המאחדת את שני התכונות vel ו- pos למערך אחד (נראה כמו state)
+	private void applyFrameToBodies(double[] pos, double[] vel, Body[] bodies) {
+		for (int i = 0; i < bodies.length; i++) {
+			int p = 3 * i;
+			bodies[i].setR(pos[p], pos[p + 1], pos[p + 2]);
+			bodies[i].setV(vel[p], vel[p + 1], vel[p + 2]);
+		}
 	}
 }
 
