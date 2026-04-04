@@ -11,10 +11,10 @@ public class Simulation {
 
 		OrdinaryDifferentialEquation ode = new NBodiesCalculations(bodies); // TODO להוסיף תגובה
 
-		double minStep = 1e-6;   // 1e-6 (10⁻⁶)
+		double minStep = 1e-12;   // 1e-6 (10⁻⁶)
 		double maxStep = 1.0;
-		double absTol = 1e-10;  // 1e-10 (10⁻¹⁰)
-		double relTol = 1e-10;  // 1e-10 (10⁻¹⁰)
+		double absTol = 1e-6;  // 1e-10 (10⁻¹⁰)
+		double relTol = 1e-6;  // 1e-10 (10⁻¹⁰)
 
 		double[] y0 = NBodiesCalculations.StateSort(bodies); // מסדר את מערך state למקרה שלא בא מסודר
 
@@ -48,6 +48,8 @@ public class Simulation {
 		ODEStateAndDerivative finalState = integrator.integrate(ode, initial, tEnd);
 
 		double[] yEnd = finalState.getPrimaryState();
+
+		//double[] yEnd = finalState.getPrimaryState();
 		double[] yEndCopy = yEnd.clone();
 
 		double[] posEnd = extractPositions(yEndCopy, bodies.length);

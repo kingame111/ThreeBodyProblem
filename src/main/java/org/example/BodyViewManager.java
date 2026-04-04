@@ -33,7 +33,9 @@ public final class BodyViewManager {
 		 מוסיף אותם לעולם וממקם אותם במיקומם ההתחלתי
 	 */
 	public void bind(Body[] bodies) {
-		if (bodies == null) bodies = new Body[0];
+		if (bodies == null){
+			bodies = new Body[0];
+		}
 
 		this.bodies = bodies;
 		this.spheres = new Sphere[bodies.length];
@@ -62,7 +64,7 @@ public final class BodyViewManager {
 			Sphere s = spheres[i];
 
 			s.setTranslateX(b.getX());
-			s.setTranslateY(b.getY());
+			s.setTranslateY(-b.getY()); // ברירת המחדל של ציר הY היא כלפי מטה לכן אני הופך אותו
 			s.setTranslateZ(b.getZ());
 		}
 	}

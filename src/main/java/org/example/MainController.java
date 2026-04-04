@@ -86,8 +86,6 @@ public class MainController {
 
 		Group world = new Group();
 
-		world.setScaleY(-1); // ברירת המחדל של ציר הY היא כלפי מטה לכן אני הופך אותו
-
 		Group spheres = new Group();
 		world.getChildren().addAll(spheres);
 		viewManager = new BodyViewManager(spheres, 5); // TODO להוסיף תגובה
@@ -253,13 +251,16 @@ public class MainController {
 
 				framePlayer.setFps(60);
 
+				framePlayer.reset();
 
 				framePlayer.play(frame -> {
 
 					for (int i = 0; i < bodies.length; i++) {
 						bodies[i].setR(frame.getX(i), frame.getY(i), frame.getZ(i));
 						bodies[i].setV(frame.getVx(i), frame.getVy(i), frame.getVz(i));
+
 					}
+
 					viewManager.render();
 				});
 			});

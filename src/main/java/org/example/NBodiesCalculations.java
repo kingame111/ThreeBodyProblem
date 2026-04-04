@@ -8,7 +8,6 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 	private final int bodiesNum; // מספר הגופים בסימולציה
 	private final Body[] bodies;
 	private final double[] a; // התאוצות של הגופים השונים בצירים השונים
-	private final double[] stateDer; // הנגזרת של state
 	//י TODO להוסיף softening לכל החישובים
 
 
@@ -17,7 +16,6 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 		this.bodiesNum = bodies.length;
 		this.bodies = bodies.clone();          // הגנה מפני שינוי מערך מבחוץ
 		this.a = new double[3 * bodiesNum];
-		this.stateDer = new double[6 * bodiesNum];
 	}
 
 
@@ -63,7 +61,7 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 
 		Arrays.fill(a, 0.0); // פעולה הממלאת את כל ערכי המערך בערך נתון
 
-		double softening2 = 1e-12; // (10^-12) softening
+		double softening2 = 1e-2; // (10^-12) softening
 
 		for (int i = 0; i < bodiesNum; i++) {
 			int i6 = 6 * i;
@@ -86,7 +84,7 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 				double invR = 1.0 / Math.sqrt(r2); // נוצר בשביל המשתנה הבא
 				double invR3 = invR * invR * invR; //    נוצר בשביל סדר ויעילות| פירוט לגבי הסיבה ללמה המשתנה בשלישית בעוד מספר שורות
 
-				double acc = Body.G * bodies[j].getM() * invR3; // נוסחה לחישוב תאוצה
+				double acc = 1 /* Body.G */ * bodies[j].getM() * invR3; // נוסחה לחישוב תאוצה
 
 
 				a[i3] += acc * dx; // dx אמור להיות חלקי r כדי שיהיה רק עם כיוון ללא גודל אך זה נעשה בinvR3
@@ -122,6 +120,8 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 
 		accelerationCalc(state); // מעדכן את מערך a לתאוצות העדכניות
 
+		double[] stateDer = new double[6 * bodiesNum];
+
 		// :stateDer לולאה להשמת ערכי המהירות בתוך
 		for (int i = 0; i < bodiesNum; i++) {
 			int i6 = i * 6;
@@ -130,6 +130,7 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 			stateDer[i6] = state[i6 + 3]; //מעביר את ערכי המיהירות בx שבstate לstateDerivative
 			stateDer[i6 + 1] = state[i6 + 4]; // מעביר את ערכי המיהירות בy שבstate לstateDerivative
 			stateDer[i6 + 2] = state[i6 + 5]; // מעביר את ערכי המיהירות בz שבstate לstateDerivative
+
 			stateDer[i6 + 3] = a[i3];  // מיישם את ערך ax בstateDerivative
 			stateDer[i6 + 4] = a[i3 + 1]; // מיישם את ערך ay בstateDerivative
 			stateDer[i6 + 5] = a[i3 + 2]; // מיישם את ערך az בstateDerivative
