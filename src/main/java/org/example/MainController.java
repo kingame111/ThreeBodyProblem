@@ -245,7 +245,7 @@ public class MainController {
 		framePlayer = new FramePlayer(timeManager);
 
 		new Thread(() -> {
-			Simulation.runSimulation(0.0, 1000.0, bodies, timeManager);
+			Simulation.runSimulation(0.0, 10000000.0, bodies, timeManager);
 
 			Platform.runLater(()->{
 

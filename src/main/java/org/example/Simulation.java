@@ -48,8 +48,6 @@ public class Simulation {
 		ODEStateAndDerivative finalState = integrator.integrate(ode, initial, tEnd);
 
 		double[] yEnd = finalState.getPrimaryState();
-
-		//double[] yEnd = finalState.getPrimaryState();
 		double[] yEndCopy = yEnd.clone();
 
 		double[] posEnd = extractPositions(yEndCopy, bodies.length);

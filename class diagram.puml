@@ -1,0 +1,197 @@
+@startuml
+top to bottom direction
+skinparam shadowing false
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+
+class Main {
+  +main(args: String[]): void
+  +start(stage: Stage): void
+}
+
+class MainController {
+  -rows: ObservableList<BodyRow>
+  -viewManager: BodyViewManager
+  -timeManager: TimeManager
+  -framePlayer: FramePlayer
+  -open: boolean
+  -xOpen: double
+  -xClosed: double
+
+  +initialize(): void
+  +toggleDrawer(): void
+  +onAdd(): void
+  +onUpdate(): void
+  +onRemove(): void
+  +onClear(): void
+  +onRun(): void
+
+  -setOpen(shouldOpen: boolean, animate: boolean): void
+  -buildBodiesArray(): Body[]
+  -readRowFromForm(): BodyRow
+  -parse(f: TextField, label: String): double
+  -clearForm(): void
+  -warn(msg: String): void
+  -safe(s: String): String
+}
+
+class Body {
+  {static} +G: double
+  -place: double[]
+  -v: double[]
+  -m: double
+  -name: String
+
+  +Body(name: String, m: double, place: double[], v: double[])
+  {static} +distance(a: Body, b: Body): double
+  +gravity(b: Body): double[]
+
+  +getR(): double[]
+  +getX(): double
+  +getY(): double
+  +getZ(): double
+  +getV(): double[]
+  +getVx(): double
+  +getVy(): double
+  +getVz(): double
+  +getM(): double
+  +getName(): String
+
+  +setM(m: double): void
+  +setR(x: double, y: double, z: double): void
+  +setV(vx: double, vy: double, vz: double): void
+  +toString(var: String): String
+}
+
+class BodyRow {
+  -name: StringProperty
+  -m: DoubleProperty
+  -x: DoubleProperty
+  -y: DoubleProperty
+  -z: DoubleProperty
+  -vx: DoubleProperty
+  -vy: DoubleProperty
+  -vz: DoubleProperty
+
+  +BodyRow(name: String, m: double, x: double, y: double, z: double, vx: double, vy: double, vz: double)
+  +nameProperty(): StringProperty
+  +mProperty(): DoubleProperty
+  +xProperty(): DoubleProperty
+  +yProperty(): DoubleProperty
+  +zProperty(): DoubleProperty
+  +vxProperty(): DoubleProperty
+  +vyProperty(): DoubleProperty
+  +vzProperty(): DoubleProperty
+
+  +getName(): String
+  +getM(): double
+  +getX(): double
+  +getY(): double
+  +getZ(): double
+  +getVx(): double
+  +getVy(): double
+  +getVz(): double
+}
+
+class Simulation {
+  {static} +runSimulation(tStart: double, tEnd: double, bodies: Body[], timeManager: TimeManager): double[]
+  {static} +Normalizer(bodies: Body[]): void
+  {static} +energyCalc(): void
+}
+
+class NBodiesCalculations {
+  -bodiesNum: int
+  -bodies: Body[]
+  -a: double[]
+
+  +NBodiesCalculations(bodies: Body[])
+  {static} +StateSort(bodies: Body[]): double[]
+  {static} +applyStateToBodies(y: double[], bodies: Body[]): void
+  +accelerationCalc(state: double[]): void
+  +getDimension(): int
+  +computeDerivatives(t: double, state: double[]): double[]
+}
+
+class TimeManager {
+  -frames: ArrayList<FrameSnapshot>
+
+  +record(t: double, pos: double[], vel: double[]): void
+  +size(): int
+  +get(x: int): FrameSnapshot
+  +getLatest(): FrameSnapshot
+}
+
+class FrameSnapshot {
+  -t: double
+  -pos: double[]
+  -vel: double[]
+
+  +FrameSnapshot(t: double, pos: double[], vel: double[])
+  +getTime(): double
+  +getX(i: int): double
+  +getY(i: int): double
+  +getZ(i: int): double
+  +getVx(i: int): double
+  +getVy(i: int): double
+  +getVz(i: int): double
+  +getBodyNum(): int
+  +copyPos(out: double[]): void
+  +copyVel(out: double[]): void
+}
+
+class FramePlayer {
+  -timeManager: TimeManager
+  -currentFrame: int
+  -fps: double
+  -lastNanos: long
+  -accumulator: double
+
+  +FramePlayer(timeManager: TimeManager)
+  +setFps(fps: double): void
+  +reset(): void
+  +play(onFrame: Consumer<FrameSnapshot>): void
+  +stop(): void
+}
+
+class BodyViewManager {
+  -world3D: Group
+  -spheres: Sphere[]
+  -bodies: Body[]
+  -defaultRadius: double
+
+  +BodyViewManager(world3D: Group, defaultRadius: double)
+  +bind(bodies: Body[]): void
+  +render(): void
+  +setMaterial(index: int, material: PhongMaterial): void
+  +getSpheres(): Sphere[]
+  +setDefaultRadius(defaultRadius: double): void
+}
+
+class ScenarioFactory {
+  -ScenarioFactory()
+  {static} +twoBodyDemo(): Body[]
+}
+
+Main ..> MainController : loads
+MainController "1" *-- "0..*" BodyRow : manages
+MainController ..> Body : creates
+MainController --> BodyViewManager
+MainController --> TimeManager
+MainController --> FramePlayer
+MainController ..> Simulation : runs
+
+BodyRow ..> Body : converted to
+
+Simulation ..> NBodiesCalculations
+Simulation ..> TimeManager
+Simulation ..> Body
+
+NBodiesCalculations --> "1..*" Body
+
+TimeManager *-- "0..*" FrameSnapshot
+FramePlayer --> TimeManager
+FramePlayer ..> FrameSnapshot
+
+BodyViewManager --> "0..*" Body : renders
+ScenarioFactory ..> Body : creates
+@enduml

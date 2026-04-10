@@ -1,0 +1,120 @@
+@startuml
+left to right direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam linetype ortho
+skinparam RectangleRoundCorner 18
+skinparam RectangleFontSize 13
+skinparam nodesep 35
+skinparam ranksep 45
+
+rectangle "סימולציית בעיית N הגופים" as SYSTEM
+
+together {
+  rectangle "אתחול המערכת" as STARTUP
+  rectangle "טעינת Main" as LOADMAIN
+  rectangle "טעינת main.fxml" as LOADFXML
+  rectangle "יצירת MainController" as CREATECTRL
+  rectangle "יצירת SubScene תלת-ממדי" as SUBSCENE
+  rectangle "הצגת הסימולציה" as DISPLAY
+}
+
+together {
+  rectangle "טופס הזנת נתוני גוף" as FORM
+  rectangle "אימות נתוני קלט" as VALIDATE
+  rectangle "ניהול טבלת הגופים" as TABLE
+  rectangle "בניית מערך גופים להרצה" as BUILDARRAY
+  rectangle "ממשק משתמש\nוניהול קלט" as UI
+}
+
+together {
+  rectangle "מנוע חישוב פיזיקלי" as PHYSICS
+  rectangle "ייצוג מצב המערכת\nכ-state" as STATE
+  rectangle "חישוב נגזרות התנועה" as DERIV
+}
+
+together {
+  rectangle "מנוע סימולציה נומרית" as SIMENGINE
+  rectangle "הרצת אינטגרטור נומרי" as INTEGRATOR
+  rectangle "שמירת פריימים לאורך הזמן" as SAVEFRAMES
+  rectangle "ניהול זמן ריצה" as TIME
+  rectangle "ניגון פריימים" as PLAY
+  rectangle "עדכון מיקום ומהירות" as UPDATE
+}
+
+together {
+  rectangle "קשירת גופים לייצוג חזותי" as BINDVIEW
+  rectangle "רינדור תנועה בזמן אמת" as RENDER
+  rectangle "הצגת מצב סופי" as FINALSTATE
+}
+
+' -------------------------
+' עוגנים לסידור כללי
+' -------------------------
+SYSTEM -[hidden]down-> STARTUP
+STARTUP -[hidden]down-> FORM
+FORM -[hidden]down-> PHYSICS
+PHYSICS -[hidden]down-> SIMENGINE
+SIMENGINE -[hidden]down-> BINDVIEW
+
+LOADMAIN -[hidden]right-> LOADFXML
+LOADFXML -[hidden]right-> CREATECTRL
+CREATECTRL -[hidden]right-> SUBSCENE
+SUBSCENE -[hidden]right-> DISPLAY
+
+FORM -[hidden]right-> VALIDATE
+VALIDATE -[hidden]right-> TABLE
+TABLE -[hidden]right-> BUILDARRAY
+BUILDARRAY -[hidden]right-> UI
+
+PHYSICS -[hidden]right-> STATE
+STATE -[hidden]right-> DERIV
+
+SIMENGINE -[hidden]right-> INTEGRATOR
+INTEGRATOR -[hidden]right-> SAVEFRAMES
+SAVEFRAMES -[hidden]right-> TIME
+TIME -[hidden]right-> PLAY
+PLAY -[hidden]right-> UPDATE
+
+BINDVIEW -[hidden]right-> RENDER
+RENDER -[hidden]right-> FINALSTATE
+
+' -------------------------
+' זרימת מידע
+' -------------------------
+SYSTEM --> STARTUP
+SYSTEM --> PHYSICS : התחל את החישוב
+SYSTEM --> SIMENGINE : פעל
+
+STARTUP --> LOADMAIN
+LOADMAIN --> LOADFXML
+LOADFXML --> CREATECTRL : קובץ הfxml
+CREATECTRL --> SUBSCENE : נתוני תצוגה
+SUBSCENE --> DISPLAY : סביבת תלת-ממד
+
+FORM --> VALIDATE : נתוני \n הגופים
+VALIDATE --> TABLE : נתונים \n מאומתים
+VALIDATE --> UI : הודעת שגיאה
+TABLE --> UI : בוצעה פעולה
+TABLE --> BUILDARRAY : רשימת גופים
+BUILDARRAY --> PHYSICS : נתוני התחלה
+BUILDARRAY --> BINDVIEW : מערך גופים
+
+PHYSICS --> STATE : נתוני התחלה
+STATE --> DERIV : state נוכחי
+DERIV --> SIMENGINE : stateDerivatives
+
+SIMENGINE --> INTEGRATOR : נתוני סימולציה
+INTEGRATOR --> SAVEFRAMES : מצבי ביניים
+INTEGRATOR --> TIME : נתוני זמן
+SAVEFRAMES --> PLAY : snapshots
+TIME --> PLAY : סדר זמנים
+PLAY --> UPDATE : פריים נוכחי
+UPDATE --> RENDER : מיקום ומהירות
+BINDVIEW --> RENDER : ייצוג חזותי
+RENDER --> FINALSTATE : תצוגה סופית
+FINALSTATE --> UI : תוצאות להצגה
+
+@enduml

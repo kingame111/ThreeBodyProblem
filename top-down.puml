@@ -1,0 +1,80 @@
+@startuml
+top to bottom direction
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam linetype ortho
+skinparam RectangleFontSize 14
+skinparam RectangleRoundCorner 18
+
+rectangle "סימולצית בעיית N הגופים" as SYSTEM #a2a2a3
+
+rectangle "אתחול המערכת" as STARTUP #FFF2CC
+rectangle "ממשק משתמש\nוניהול קלט" as UI #D5E8D4
+rectangle "מנוע חישוב פיזיקלי" as PHYSICS #F8CECC
+rectangle "מנוע סימולציה נומרית" as SIM #E1D5E7
+rectangle "הצגת הסימולציה" as VISUAL #CFE2F3
+
+
+rectangle "טעינת Main" as STARTUP1 #FFF9E6
+rectangle "טעינת main.fxml" as STARTUP2 #FFF9E6
+rectangle "יצירת MainController" as STARTUP3 #FFF9E6
+
+rectangle "טופס הזנת נתוני גוף" as UI1 #EAF4E6
+rectangle "ניהול טבלת הגופים" as UI2 #EAF4E6
+rectangle "אימות נתוני קלט" as UI3 #EAF4E6
+rectangle "בניית מערך גופים להרצה" as UI4 #EAF4E6
+
+rectangle "ייצוג מצב המערכת כ-state" as PHYSICS1 #FDEAEA
+rectangle "חישוב נגזרות התנועה" as PHYSICS2 #FDEAEA
+
+rectangle "הרצת אינטגרטור נומרי" as SIM1 #F3EDF7
+rectangle "שמירת פריימים לאורך הזמן" as SIM2 #F3EDF7
+rectangle "עדכון מיקום ומהירות" as SIM3 #F3EDF7
+rectangle "ניהול זמן הריצה" as SIM4 #F3EDF7
+
+rectangle "יצירת SubScene תלת־ממדי" as VIS1 #EAF3FA
+rectangle "קשירת גופים לייצוג חזותי" as VIS2 #EAF3FA
+rectangle "ניגון פריימים" as VIS3 #EAF3FA
+rectangle "רינדור תנועה בזמן אמת" as VIS4 #EAF3FA
+rectangle "הצגת מצב סופי" as VIS5 #EAF3FA
+
+
+SYSTEM --> STARTUP
+SYSTEM --> UI
+SYSTEM --> PHYSICS
+SYSTEM --> SIM
+SYSTEM --> VISUAL
+
+
+STARTUP --> STARTUP1
+STARTUP --> STARTUP2
+STARTUP --> STARTUP3
+
+UI --> UI1
+UI --> UI2
+UI --> UI3
+UI --> UI4
+
+PHYSICS --> PHYSICS1
+PHYSICS --> PHYSICS2
+
+SIM --> SIM1
+SIM --> SIM2
+SIM --> SIM3
+SIM --> SIM4
+
+VISUAL --> VIS1
+VISUAL --> VIS2
+VISUAL --> VIS3
+VISUAL --> VIS4
+VISUAL --> VIS5
+
+
+UI ..> PHYSICS : קלט ופרמטרים
+PHYSICS ..> SIM : מהירויות ותאוצות
+SIM ..> VISUAL : מיקומים ומהירויות
+
+
+@enduml

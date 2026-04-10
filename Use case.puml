@@ -1,0 +1,52 @@
+@startuml
+top to bottom direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+actor "משתמש" as User
+
+rectangle "מערכת סימולציית בעיית שלושת הגופים"
+
+    usecase "הזנת נתוני גוף" as UC1
+    usecase "הוספת גוף\nלרשימת הגופים" as UC2
+    usecase "עדכון גוף קיים" as UC3
+    usecase "מחיקת גוף\nמרשימת הגופים" as UC4
+    usecase "ניקוי טופס הקלט" as UC5
+    usecase "התחלת הסימולציה" as UC6
+
+    usecase "בדיקת תקינות קלט" as UC7
+    usecase "הצגת הודעת שגיאה" as UC8
+
+    usecase "ביצוע חישוב נומרי" as UC9
+    usecase "חישוב כוחות כבידה\nבין הגופים" as UC10
+    usecase "עדכון מהירויות\nומיקום" as UC11
+    usecase "עדכון התצוגה\nהגרפית" as UC12
+
+
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC6
+
+UC2 .> UC7 : <<include>>
+UC3 .> UC7 : <<include>>
+
+UC8 .> UC7 : <<extend>>
+UC8 .> UC3 : <<extend>>
+UC8 .> UC6 : <<extend>>
+
+UC6 .> UC9 : <<include>>
+UC9 .> UC10 : <<include>>
+UC9 .> UC11 : <<include>>
+UC6 .> UC12 : <<include>>
+
+UC7 -[hidden]down-> UC8
+UC8 -[hidden]right-> UC9
+UC9 -[hidden]down-> UC10
+UC10 -[hidden]right-> UC11
+UC11 -[hidden]right-> UC12
+
+@enduml
