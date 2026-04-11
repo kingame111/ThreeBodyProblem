@@ -1,0 +1,23 @@
+@startuml
+left to right direction
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+rectangle "Main Screen\n(main.fxml)" as MainScreen
+rectangle "Warning Dialog\n(חלון אזהרה)" as WarningDialog
+
+note top of MainScreen
+כולל:
+- אזור תצוגה תלת-ממדי
+- תפריט צד
+- TitledPane: Bodies
+- טבלת גופים
+- טופס הזנת נתונים
+- כפתורי Add / Update / Remove / Clear / Run
+end note
+
+MainScreen ---> WarningDialog :  שגיאה:\nקלט לא תקין/\n אין גוף נבחר/\n אין גופים להרצה
+WarningDialog ---> MainScreen : אישור\nוחזרה למסך הראשי
+
+@enduml

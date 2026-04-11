@@ -3,7 +3,7 @@ package org.example;
 import java.util.Arrays;
 
 public class Body {
-	static public double G = 6.67430 * Math.pow(10, -11);
+	static public double G = 1;//6.67430 * Math.pow(10, -11);
 	private double[] place = new double[3]; // מערך של x y z המכיל את מיקום האובייקט
 	private double[] v = new double[3]; // מערך של vx vy vz המכיל את מהירויות האובייקט
 	private double m; // מסת האובייקט

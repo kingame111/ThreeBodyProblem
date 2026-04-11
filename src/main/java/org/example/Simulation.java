@@ -26,7 +26,7 @@ public class Simulation {
 				new DormandPrince853Integrator(minStep, maxStep, absTol, relTol);
 
 		final int[] steps = {0};
-		final int uiEvery = 1;
+		final int uiEvery = 1; //
 
 		integrator.addStepHandler(interpolator -> {
 			steps[0]++;
