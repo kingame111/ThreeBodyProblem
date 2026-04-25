@@ -16,14 +16,6 @@ public class Body {
 		this.v = v.clone();
 	}
 
-	// פעולה לחישוב מרחק בין שתי גופים
-	public static double distance(Body a, Body b) {
-		double total = 0;
-		for (int i = 0; i < 3; i++) { // מחשב את המרחק בין X,Y,Z בסדר זה ומחבר את המרחק הקודם עם העכשוי
-			total = total + Math.pow(a.getR()[i] - b.getR()[i], 2);
-		}
-		return Math.sqrt(total);
-	}
 
 	// ---getters---
 	public double[] getR() {
