@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+
 public class MainController {
 
 	private final ObservableList<BodyRow> rows = FXCollections.observableArrayList();
@@ -40,6 +41,8 @@ public class MainController {
 	private TimeManager timeManager;
 
 	private FramePlayer framePlayer;
+
+	private Thread simulationThread;
 
 	private boolean open = true;
 
@@ -184,7 +187,9 @@ public class MainController {
 	@FXML
 	private void onAdd() {
 		BodyRow r = readRowFromForm(); // י r שווה לערכים שהמשתמש הכניס לgridPane
-		if (r == null) return;
+		if (r == null) {
+			return;
+		}
 		rows.add(r);
 		clearForm();
 	}
@@ -227,6 +232,21 @@ public class MainController {
 
 	@FXML
 	private void onRun() {
+		// עוצר את החישוב הנומרי במידה ופעל
+		if (simulationThread != null && simulationThread.isAlive()) {
+			Simulation.stopCalculation();
+
+			if (framePlayer != null) {
+				framePlayer.stop();
+				framePlayer.reset();
+			}
+
+			if (timeManager != null) {
+				timeManager.clear();
+			}
+
+			return;
+		}
 
 		if (framePlayer != null) { // עוצר ניגון קודם במידה ויש
 			framePlayer.stop();
@@ -244,27 +264,27 @@ public class MainController {
 
 		framePlayer = new FramePlayer(timeManager);
 
-		new Thread(() -> {
+		Simulation.resetStopCalculation();
+
+		simulationThread = new Thread(() -> {
 			Simulation.runSimulation(0.0, 10000.0, bodies, timeManager);
 
-			Platform.runLater(()->{
-
+			Platform.runLater(() -> {
 				framePlayer.setFps(60);
-
 				framePlayer.reset();
 
 				framePlayer.play(frame -> {
-
 					for (int i = 0; i < bodies.length; i++) {
 						bodies[i].setR(frame.getX(i), frame.getY(i), frame.getZ(i));
 						bodies[i].setV(frame.getVx(i), frame.getVy(i), frame.getVz(i));
-
 					}
 
 					viewManager.render();
 				});
 			});
-		}, "sim-thread").start();
+		}, "sim-thread");
+
+		simulationThread.start();
 		// מה שיגרום לסימולציה לרוץ
 	}
 

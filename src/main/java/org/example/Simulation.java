@@ -25,14 +25,10 @@ public class Simulation {
 		DormandPrince853Integrator integrator =
 				new DormandPrince853Integrator(minStep, maxStep, absTol, relTol);
 
-		final int[] steps = {0};
-		final int uiEvery = 1; //
-
 		integrator.addStepHandler(interpolator -> {
-			steps[0]++;
 
-			if (steps[0] % uiEvery != 0) {
-				return;
+			if (stopCalculation) {
+				throw new CalculationStoppedException();
 			}
 
 			double[] y = interpolator.getCurrentState().getPrimaryState();
@@ -45,16 +41,39 @@ public class Simulation {
 		});
 
 		ODEState initial = new ODEState(tStart, y0);
-		ODEStateAndDerivative finalState = integrator.integrate(ode, initial, tEnd);
+		ODEStateAndDerivative finalState;
 
-		double[] yEnd = finalState.getPrimaryState();
-		double[] yEndCopy = yEnd.clone();
+		try {
+			finalState = integrator.integrate(ode, initial, tEnd);
+		} catch (CalculationStoppedException e) {
+			return y0;
+		}
 
-		double[] posEnd = extractPositions(yEndCopy, bodies.length);
-		double[] velEnd = extractVelocities(yEndCopy, bodies.length);
-		timeManager.record(finalState.getTime(), posEnd, velEnd);
+		FrameSnapshot latest = timeManager.getLatest();
 
-		return yEnd;
+		if (latest == null || Math.abs(latest.getTime() - finalState.getTime()) > 1e-9) {
+			double[] yEnd = finalState.getPrimaryState().clone();
+
+			double[] posEnd = extractPositions(yEnd, bodies.length);
+			double[] velEnd = extractVelocities(yEnd, bodies.length);
+
+			timeManager.record(finalState.getTime(), posEnd, velEnd);
+		}
+
+		return finalState.getPrimaryState();
+	}
+
+	private static volatile boolean stopCalculation = false;
+
+	public static void stopCalculation() {
+		stopCalculation = true;
+	}
+
+	public static void resetStopCalculation() {
+		stopCalculation = false;
+	}
+
+	private static class CalculationStoppedException extends RuntimeException {
 	}
 
 	public static void Normalizer(Body[] bodies) {

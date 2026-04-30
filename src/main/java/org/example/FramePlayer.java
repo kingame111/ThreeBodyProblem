@@ -28,6 +28,8 @@ public class FramePlayer {
 	// מחזיר את הניגון לפריים הראשון
 	public void reset() {
 		currentFrame = 0;
+		lastNanos = 0;
+		accumulator = 0;
 	}
 
 	public void play(Consumer<FrameSnapshot> onFrame) {

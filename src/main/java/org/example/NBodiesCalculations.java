@@ -84,7 +84,7 @@ public class NBodiesCalculations implements OrdinaryDifferentialEquation {
 				double invR = 1.0 / Math.sqrt(r2); // נוצר בשביל המשתנה הבא
 				double invR3 = invR * invR * invR; //    נוצר בשביל סדר ויעילות| פירוט לגבי הסיבה ללמה המשתנה בשלישית בעוד מספר שורות
 
-				double acc = 1 /* Body.G */ * bodies[j].getM() * invR3; // נוסחה לחישוב תאוצה
+				double acc =  Body.G * bodies[j].getM() * invR3; // נוסחה לחישוב תאוצה
 
 
 				a[i3] += acc * dx; // dx אמור להיות חלקי r כדי שיהיה רק עם כיוון ללא גודל אך זה נעשה בinvR3
