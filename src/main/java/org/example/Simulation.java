@@ -4,10 +4,13 @@ import org.hipparchus.ode.ODEState;
 import org.hipparchus.ode.ODEStateAndDerivative;
 import org.hipparchus.ode.OrdinaryDifferentialEquation;
 import org.hipparchus.ode.nonstiff.DormandPrince853Integrator;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Simulation {
 
-	public static double[] runSimulation(double tStart, double tEnd, Body[] bodies, TimeManager timeManager) {
+
+	public static double[] runSimulation(double tStart, double tEnd, Body[] bodies,
+										 TimeManager timeManager, AtomicBoolean stopCalculation) {
 
 		OrdinaryDifferentialEquation ode = new NBodiesCalculations(bodies); // TODO להוסיף תגובה
 
@@ -27,7 +30,7 @@ public class Simulation {
 
 		integrator.addStepHandler(interpolator -> {
 
-			if (stopCalculation) {
+			if (stopCalculation.get()) {
 				throw new CalculationStoppedException();
 			}
 
@@ -46,7 +49,7 @@ public class Simulation {
 		try {
 			finalState = integrator.integrate(ode, initial, tEnd);
 		} catch (CalculationStoppedException e) {
-			return y0;
+			return null;
 		}
 
 		FrameSnapshot latest = timeManager.getLatest();
@@ -61,16 +64,6 @@ public class Simulation {
 		}
 
 		return finalState.getPrimaryState();
-	}
-
-	private static volatile boolean stopCalculation = false;
-
-	public static void stopCalculation() {
-		stopCalculation = true;
-	}
-
-	public static void resetStopCalculation() {
-		stopCalculation = false;
 	}
 
 	private static class CalculationStoppedException extends RuntimeException {

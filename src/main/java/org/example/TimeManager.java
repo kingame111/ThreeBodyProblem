@@ -28,8 +28,4 @@ public class TimeManager {
 
 		return frames.get(frames.size() - 1);
 	}
-
-	public void clear() {
-		frames.clear();
-	}
 }

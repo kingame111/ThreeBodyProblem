@@ -4,7 +4,6 @@ public final class FrameSnapshot {
 	private final double t; // הזמן של הפריים
 	private final double[] pos; // המיקום של הגופים בפריים
 	private final double[] vel; // המהירות של הגופים בפריים
-	// TODO אם אין שימוש במהירויות עדיף להוריד
 
 	// בנאי
 	public FrameSnapshot(double t, double[] pos, double[] vel) {
